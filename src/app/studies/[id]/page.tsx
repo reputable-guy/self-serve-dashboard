@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useStudies, Study } from "@/lib/studies-store";
+import { StudyPreview } from "@/components/study-preview";
+import { StudyDetailsPreview } from "@/components/study-details-preview";
 import {
   ArrowLeft,
   Clock,
@@ -16,6 +18,7 @@ import {
   Play,
   ExternalLink,
   Copy,
+  Smartphone,
 } from "lucide-react";
 
 const statusStyles: Record<Study["status"], { bg: string; text: string; label: string }> = {
@@ -99,7 +102,7 @@ export default function StudyDetailsPage() {
                   Launch Study
                 </Button>
               )}
-              <Button variant="outline">
+              <Button variant="outline" onClick={() => router.push(`/studies/${study.id}/edit`)}>
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
               </Button>
@@ -136,6 +139,10 @@ export default function StudyDetailsPage() {
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="preview" className="flex items-center gap-2">
+              <Smartphone className="h-4 w-4" />
+              Participant Preview
+            </TabsTrigger>
             <TabsTrigger value="participants">Participants</TabsTrigger>
             <TabsTrigger value="testimonials">Testimonials</TabsTrigger>
             <TabsTrigger value="embed">Embed Code</TabsTrigger>
@@ -276,6 +283,60 @@ export default function StudyDetailsPage() {
                     </div>
                   </CardContent>
                 </Card>
+
+                {/* Weekly Check-in Questions */}
+                {(study.villainVariable || (study.customQuestions && study.customQuestions.length > 0)) && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <span>📋</span> Weekly Check-in Questions
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {study.villainVariable && (
+                        <div className="p-4 bg-[#111827] rounded-lg">
+                          <p className="text-sm text-white mb-2">
+                            &quot;This week, did you notice any changes regarding your{" "}
+                            <span className="text-[#00D1C1] font-medium">{study.villainVariable}</span>?&quot;
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {(study.villainQuestionDays || [7, 14, 21, 28]).map((day) => (
+                              <span key={day} className="px-2 py-0.5 bg-gray-700 rounded text-xs text-gray-300">
+                                Day {day}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {study.customQuestions && study.customQuestions.length > 0 && (
+                        <div className="space-y-3">
+                          <p className="text-sm font-medium text-muted-foreground">Custom Questions</p>
+                          {study.customQuestions.map((q, idx) => (
+                            <div key={idx} className="p-3 border rounded-lg">
+                              <p className="text-sm font-medium mb-1">{q.questionText || `Question ${idx + 1}`}</p>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <span className="px-2 py-0.5 bg-muted rounded">
+                                  {q.questionType === "multiple_choice" ? "Multiple Choice" :
+                                   q.questionType === "voice_and_text" ? "Voice + Text" : "Text"}
+                                </span>
+                                <span>Days: {q.showOnDays.join(", ")}</span>
+                              </div>
+                              {q.questionType === "multiple_choice" && q.options.filter(o => o).length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-2">
+                                  {q.options.filter(o => o).map((opt, oIdx) => (
+                                    <span key={oIdx} className="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs">
+                                      {opt}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
               </div>
 
               {/* Right Column - Reward Summary */}
@@ -351,6 +412,68 @@ export default function StudyDetailsPage() {
                     </CardContent>
                   </Card>
                 )}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="preview">
+            <div className="space-y-6">
+              <div className="text-center max-w-2xl mx-auto mb-8">
+                <h2 className="text-xl font-semibold mb-2">Participant Experience Preview</h2>
+                <p className="text-muted-foreground">
+                  This is exactly how participants will see your study in the Reputable app.
+                  The left shows the study card in the catalog, and the right shows the full details page they&apos;ll see when they tap to learn more.
+                </p>
+              </div>
+
+              <div className="flex justify-center gap-12">
+                {/* Card View */}
+                <div className="text-center">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-4">
+                    Study Card (Catalog View)
+                  </h3>
+                  <StudyPreview
+                    productName={study.productName}
+                    productImage={study.productImage}
+                    category={study.category}
+                    rebateAmount={study.rebateAmount}
+                    durationDays={study.durationDays}
+                    totalSpots={study.totalSpots}
+                    requiredDevice={study.requiredDevice}
+                    studyTitle={study.studyTitle}
+                    hookQuestion={study.hookQuestion}
+                  />
+                </div>
+
+                {/* Details View */}
+                <div className="text-center">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-4">
+                    Study Details (Full Page)
+                  </h3>
+                  <StudyDetailsPreview
+                    productName={study.productName}
+                    productImage={study.productImage}
+                    studyTitle={study.studyTitle}
+                    hookQuestion={study.hookQuestion}
+                    rebateAmount={study.rebateAmount}
+                    durationDays={study.durationDays}
+                    totalSpots={study.totalSpots}
+                    requiredDevice={study.requiredDevice}
+                    discoverItems={study.discoverItems}
+                    dailyRoutine={study.dailyRoutine}
+                    whatYouGet={study.whatYouGet}
+                  />
+                </div>
+              </div>
+
+              <div className="text-center mt-8">
+                <p className="text-sm text-muted-foreground mb-4">
+                  Want to make changes? Edit your study to update the content.
+                </p>
+                <Button variant="outline" onClick={() => router.push(`/studies/${study.id}/edit`)}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Study Content
+                </Button>
               </div>
             </div>
           </TabsContent>
