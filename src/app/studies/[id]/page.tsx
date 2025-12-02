@@ -51,9 +51,8 @@ import {
   TrustBadgeWidgetPreview,
   EmbedCodeDisplay,
 } from "@/components/embed-widgets";
-import { VerificationBadge } from "@/components/verification-page";
-import { StoryCardActions } from "@/components/story-card-actions";
 import { StudyLinkActions } from "@/components/study-link-actions";
+import { VideoTestimonialCard } from "@/components/video-testimonial-card";
 
 // Determine the default tab based on study status
 function getDefaultTab(status: Study["status"]): string {
@@ -1079,85 +1078,11 @@ export default function StudyDetailsPage() {
 
                 <div className="grid grid-cols-2 gap-6">
                   {MOCK_TESTIMONIALS.map((testimonial) => (
-                    <Card key={testimonial.id} className="overflow-hidden hover:border-[#00D1C1]/50 transition-colors">
-                      {/* Card Header with Verified Badge */}
-                      <div className="bg-gradient-to-r from-[#00D1C1]/10 to-transparent p-4 border-b">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="h-12 w-12 rounded-full bg-[#00D1C1]/20 flex items-center justify-center">
-                              <span className="font-semibold text-[#00D1C1]">{testimonial.initials}</span>
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold">{testimonial.participant}</span>
-                                <span className="text-xs px-2 py-0.5 rounded-full bg-muted">{testimonial.age} · {testimonial.location}</span>
-                              </div>
-                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                <Watch className="h-3 w-3" />
-                                <span>{testimonial.device}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/10 text-green-500 text-xs font-medium">
-                            <BadgeCheck className="h-3.5 w-3.5" />
-                            Verified
-                          </div>
-                        </div>
-                      </div>
-
-                      <CardContent className="p-4 space-y-4">
-                        {/* Rating */}
-                        <div className="flex items-center gap-2">
-                          <div className="flex">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
-                                key={star}
-                                className={`h-4 w-4 ${star <= Math.floor(testimonial.overallRating) ? "text-yellow-500 fill-yellow-500" : "text-muted"}`}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-sm font-medium">{testimonial.overallRating}</span>
-                        </div>
-
-                        {/* Metrics Grid */}
-                        <div className="grid grid-cols-3 gap-2">
-                          {testimonial.metrics.map((metric) => (
-                            <div key={metric.label} className="p-2 rounded-lg bg-[#00D1C1]/10 text-center">
-                              <p className="text-lg font-bold text-[#00D1C1]">{metric.value}</p>
-                              <p className="text-xs text-muted-foreground">{metric.label}</p>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Benefits */}
-                        <div className="space-y-1">
-                          {testimonial.benefits.map((benefit) => (
-                            <div key={benefit} className="flex items-center gap-2 text-sm">
-                              <Check className="h-3.5 w-3.5 text-green-500" />
-                              <span>{benefit}</span>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Quote */}
-                        <div className="p-3 rounded-lg bg-muted/50 border-l-2 border-[#00D1C1]">
-                          <p className="text-sm italic">&quot;{testimonial.story}&quot;</p>
-                        </div>
-
-                        {/* Verification Footer */}
-                        <div className="flex items-center justify-between pt-3 border-t">
-                          <Link href={`/verify/${testimonial.verificationId}`}>
-                            <VerificationBadge
-                              verificationId={testimonial.verificationId}
-                            />
-                          </Link>
-                          <StoryCardActions
-                            testimonial={testimonial}
-                            studyId={study.id}
-                          />
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <VideoTestimonialCard
+                      key={testimonial.id}
+                      testimonial={testimonial}
+                      studyId={study.id}
+                    />
                   ))}
                 </div>
               </div>
