@@ -1546,6 +1546,7 @@ export default function StudyDetailsPage() {
       {selectedParticipant && (
         <ParticipantDetailPanel
           participant={selectedParticipant}
+          study={study}
           onClose={() => setSelectedParticipant(null)}
         />
       )}

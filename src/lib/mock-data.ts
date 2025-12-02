@@ -1,6 +1,8 @@
 // Mock data for study dashboard preview and development
 // This data is used when no real participants have enrolled
 
+import { CustomQuestion } from "./study-context";
+
 export interface MockParticipant {
   id: number;
   name: string;
@@ -509,4 +511,122 @@ export const MOCK_PARTICIPANT_DETAILS: Record<number, ParticipantDetail> = {
 // Helper to get participant detail by ID
 export function getParticipantDetail(participantId: number): ParticipantDetail | undefined {
   return MOCK_PARTICIPANT_DETAILS[participantId];
+}
+
+// Generate check-in responses using study's actual questions
+function generateCheckInsWithStudyQuestions(
+  numDays: number,
+  compliance: number,
+  villainVariable: string,
+  villainQuestionDays: number[],
+  customQuestions: CustomQuestion[]
+): CheckInResponse[] {
+  const baseDate = new Date("2024-11-20");
+  const checkIns: CheckInResponse[] = [];
+
+  const villainAnswers = [
+    "Yes, noticeably better this week",
+    "Somewhat improved",
+    "About the same",
+    "Much better than before",
+    "Significant improvement",
+    "Slight improvement",
+  ];
+
+  for (let day = 1; day <= numDays; day++) {
+    const date = new Date(baseDate);
+    date.setDate(date.getDate() + day - 1);
+
+    // Determine if this check-in was completed based on compliance
+    const completed = Math.random() * 100 < compliance;
+
+    const checkIn: CheckInResponse = {
+      day,
+      date: date.toISOString().split("T")[0],
+      completed,
+    };
+
+    if (completed) {
+      // Add villain response on configured villain days
+      if (villainVariable && villainQuestionDays.includes(day)) {
+        checkIn.villainResponse = {
+          question: `Did you notice any changes regarding your ${villainVariable}?`,
+          answer: villainAnswers[Math.floor(Math.random() * villainAnswers.length)],
+        };
+      }
+
+      // Add custom question responses for questions that should appear on this day
+      const questionsForThisDay = customQuestions.filter(q => q.showOnDays.includes(day));
+
+      if (questionsForThisDay.length > 0) {
+        checkIn.customResponses = questionsForThisDay.map((q) => {
+          let answer: string;
+
+          if (q.questionType === "text" || q.questionType === "voice_and_text") {
+            // Generate realistic text responses based on question content
+            const textResponses = [
+              "Everything is going well",
+              "No issues to report",
+              "Feeling good today",
+              "Much better than last week",
+              "Some minor improvements noticed",
+            ];
+            answer = textResponses[Math.floor(Math.random() * textResponses.length)];
+          } else {
+            // Multiple choice - pick from the configured options
+            const validOptions = q.options.filter(o => o && o.trim() !== "");
+            answer = validOptions.length > 0
+              ? validOptions[Math.floor(Math.random() * validOptions.length)]
+              : "N/A";
+          }
+
+          return {
+            question: q.questionText || "Custom question",
+            questionType: q.questionType,
+            answer,
+          };
+        });
+      }
+    }
+
+    checkIns.push(checkIn);
+  }
+
+  return checkIns;
+}
+
+// Generate participant detail dynamically using study's questions
+export function generateParticipantDetailForStudy(
+  participant: MockParticipant,
+  villainVariable: string,
+  villainQuestionDays: number[],
+  customQuestions: CustomQuestion[]
+): ParticipantDetail {
+  const numDays = participant.day;
+  const improving = participant.status !== "at-risk";
+
+  // Base baseline metrics vary by participant
+  const baselinesByParticipant: Record<number, ParticipantDetail["baselineMetrics"]> = {
+    1: { avgDeepSleep: 45, avgRemSleep: 80, avgTotalSleep: 305, avgHrv: 42, avgRestingHr: 62, avgSleepScore: 72 },
+    2: { avgDeepSleep: 38, avgRemSleep: 75, avgTotalSleep: 290, avgHrv: 38, avgRestingHr: 65, avgSleepScore: 68 },
+    3: { avgDeepSleep: 50, avgRemSleep: 85, avgTotalSleep: 320, avgHrv: 45, avgRestingHr: 58, avgSleepScore: 75 },
+    4: { avgDeepSleep: 42, avgRemSleep: 78, avgTotalSleep: 300, avgHrv: 40, avgRestingHr: 64, avgSleepScore: 70 },
+    5: { avgDeepSleep: 35, avgRemSleep: 70, avgTotalSleep: 275, avgHrv: 35, avgRestingHr: 68, avgSleepScore: 62 },
+  };
+
+  const baselineMetrics = baselinesByParticipant[participant.id] || baselinesByParticipant[1];
+
+  return {
+    participantId: participant.id,
+    baselineMetrics,
+    dailyMetrics: generateDailyMetrics(participant.id, numDays, improving),
+    checkIns: generateCheckInsWithStudyQuestions(
+      numDays,
+      participant.compliance,
+      villainVariable,
+      villainQuestionDays,
+      customQuestions
+    ),
+    syncHistory: generateSyncHistory(numDays, participant.compliance),
+  };
 }

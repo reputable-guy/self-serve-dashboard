@@ -7,8 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   MockParticipant,
   ParticipantDetail,
-  getParticipantDetail,
+  generateParticipantDetailForStudy,
 } from "@/lib/mock-data";
+import { Study } from "@/lib/studies-store";
 import {
   X,
   Watch,
@@ -28,6 +29,7 @@ import {
 
 interface ParticipantDetailPanelProps {
   participant: MockParticipant;
+  study: Study;
   onClose: () => void;
 }
 
@@ -261,9 +263,18 @@ function SyncCalendar({
   );
 }
 
-export function ParticipantDetailPanel({ participant, onClose }: ParticipantDetailPanelProps) {
+export function ParticipantDetailPanel({ participant, study, onClose }: ParticipantDetailPanelProps) {
   const [activeTab, setActiveTab] = useState("metrics");
-  const detail = getParticipantDetail(participant.id);
+
+  // Generate participant detail using the study's actual questions
+  const detail = useMemo(() => {
+    return generateParticipantDetailForStudy(
+      participant,
+      study.villainVariable,
+      study.villainQuestionDays || [7, 14, 21, 28],
+      study.customQuestions || []
+    );
+  }, [participant, study.villainVariable, study.villainQuestionDays, study.customQuestions]);
 
   // Calculate current averages from last 3 days of metrics
   const currentMetrics = useMemo(() => {
