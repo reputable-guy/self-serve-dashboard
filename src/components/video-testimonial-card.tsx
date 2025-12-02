@@ -24,9 +24,11 @@ import {
 interface VideoTestimonialCardProps {
   testimonial: MockTestimonial;
   studyId: string;
+  isFeatured?: boolean;
+  onToggleFeatured?: () => void;
 }
 
-export function VideoTestimonialCard({ testimonial, studyId }: VideoTestimonialCardProps) {
+export function VideoTestimonialCard({ testimonial, studyId, isFeatured = false, onToggleFeatured }: VideoTestimonialCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -46,7 +48,7 @@ export function VideoTestimonialCard({ testimonial, studyId }: VideoTestimonialC
 
   return (
     <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-      <Card className="overflow-hidden hover:border-[#00D1C1]/50 transition-colors">
+      <Card className={`overflow-hidden transition-colors ${isFeatured ? "border-yellow-500/50 ring-1 ring-yellow-500/20" : "hover:border-[#00D1C1]/50"}`}>
         {/* Card Header with Verified Badge */}
         <div className="bg-gradient-to-r from-[#00D1C1]/10 to-transparent p-4 border-b">
           <div className="flex items-center justify-between">
@@ -68,6 +70,20 @@ export function VideoTestimonialCard({ testimonial, studyId }: VideoTestimonialC
               </div>
             </div>
             <div className="flex items-center gap-2">
+              {/* Feature Star Toggle */}
+              {onToggleFeatured && (
+                <button
+                  onClick={onToggleFeatured}
+                  className={`p-1.5 rounded-full transition-colors ${
+                    isFeatured
+                      ? "bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500/30"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-yellow-500"
+                  }`}
+                  title={isFeatured ? "Remove from featured" : "Add to featured widgets"}
+                >
+                  <Star className={`h-4 w-4 ${isFeatured ? "fill-yellow-500" : ""}`} />
+                </button>
+              )}
               {/* Video Available Badge */}
               {testimonial.hasVideo && (
                 <CollapsibleTrigger asChild>
