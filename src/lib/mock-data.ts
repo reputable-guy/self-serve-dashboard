@@ -30,6 +30,11 @@ export interface MockTestimonial {
   verified: boolean;
   verificationId: string;
   device: string;
+  // Video testimonial fields
+  hasVideo?: boolean;
+  videoUrl?: string;
+  videoThumbnail?: string;
+  videoDuration?: string; // e.g., "0:34"
 }
 
 export interface MockDemographicItem {
@@ -72,6 +77,10 @@ export const MOCK_TESTIMONIALS: MockTestimonial[] = [
     verified: true,
     verificationId: "2025-087",
     device: "Oura Ring",
+    hasVideo: true,
+    videoUrl: "https://example.com/testimonials/sarah-m.mp4",
+    videoThumbnail: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=300&fit=crop",
+    videoDuration: "0:34",
   },
   {
     id: 2,
@@ -110,6 +119,10 @@ export const MOCK_TESTIMONIALS: MockTestimonial[] = [
     verified: true,
     verificationId: "2025-098",
     device: "Apple Watch",
+    hasVideo: true,
+    videoUrl: "https://example.com/testimonials/mike-t.mp4",
+    videoThumbnail: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop",
+    videoDuration: "0:47",
   },
   {
     id: 4,
