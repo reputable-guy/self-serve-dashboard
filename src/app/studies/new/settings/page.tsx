@@ -255,7 +255,7 @@ export default function CreateStudyStep2() {
                     </div>
                   </div>
 
-                  {/* Weekly Check-in Questions */}
+                  {/* Check-in Questions */}
                   <Collapsible open={isCheckInOpen} onOpenChange={setIsCheckInOpen}>
                     <Card className="border-dashed">
                       <CollapsibleTrigger asChild>
@@ -263,11 +263,11 @@ export default function CreateStudyStep2() {
                           <div className="flex items-center justify-between">
                             <div>
                               <h3 className="font-medium flex items-center gap-2">
-                                <span>📋</span> Weekly Check-in Questions
+                                <span>📋</span> Check-in Questions
                                 <span className="text-xs font-normal text-muted-foreground">(Optional)</span>
                               </h3>
                               <p className="text-xs text-muted-foreground mt-1">
-                                Ask participants specific questions about their experience on certain days
+                                Configure weekly symptom check-ins and custom questions for any day
                               </p>
                             </div>
                             <ChevronDown className={`h-5 w-5 transition-transform ${isCheckInOpen ? "rotate-180" : ""}`} />
@@ -276,9 +276,16 @@ export default function CreateStudyStep2() {
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <CardContent className="pt-0 space-y-6">
-                          {/* Hero Symptom / Villain Variable */}
-                          <div className="space-y-2">
-                            <Label htmlFor="villainVariable">What problem does your product solve?</Label>
+                          {/* Weekly Hero Symptom Check-in */}
+                          <div className="space-y-4">
+                            <div>
+                              <h4 className="text-sm font-semibold">Weekly Hero Symptom Check-in</h4>
+                              <p className="text-xs text-muted-foreground">
+                                Ask participants about their primary symptom on specific days
+                              </p>
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="villainVariable">What problem does your product solve?</Label>
                             <Input
                               id="villainVariable"
                               maxLength={50}
@@ -349,18 +356,26 @@ export default function CreateStudyStep2() {
                               Questions appear after the daily check-in on selected days
                             </p>
                           </div>
+                          </div>
 
-                          {/* Additional Custom Questions */}
-                          <Collapsible open={isCustomQuestionsOpen} onOpenChange={setIsCustomQuestionsOpen}>
-                            <CollapsibleTrigger asChild>
-                              <Button variant="outline" className="w-full justify-between">
-                                <span className="flex items-center gap-2">
-                                  <Plus className="w-4 h-4" />
-                                  Additional Custom Questions
-                                </span>
-                                <ChevronDown className={`h-4 w-4 transition-transform ${isCustomQuestionsOpen ? "rotate-180" : ""}`} />
-                              </Button>
-                            </CollapsibleTrigger>
+                          {/* Additional Questions */}
+                          <div className="space-y-4 pt-4 border-t">
+                            <div>
+                              <h4 className="text-sm font-semibold">Additional Questions</h4>
+                              <p className="text-xs text-muted-foreground">
+                                Add custom questions that can be shown on any day of the study
+                              </p>
+                            </div>
+                            <Collapsible open={isCustomQuestionsOpen} onOpenChange={setIsCustomQuestionsOpen}>
+                              <CollapsibleTrigger asChild>
+                                <Button variant="outline" className="w-full justify-between">
+                                  <span className="flex items-center gap-2">
+                                    <Plus className="w-4 h-4" />
+                                    {formData.customQuestions.length} question{formData.customQuestions.length !== 1 ? 's' : ''} configured
+                                  </span>
+                                  <ChevronDown className={`h-4 w-4 transition-transform ${isCustomQuestionsOpen ? "rotate-180" : ""}`} />
+                                </Button>
+                              </CollapsibleTrigger>
                             <CollapsibleContent className="pt-4 space-y-4">
                               {formData.customQuestions.map((question, qIndex) => (
                                 <div key={qIndex} className="p-4 border rounded-lg space-y-4 bg-muted/30">
@@ -611,6 +626,7 @@ export default function CreateStudyStep2() {
                               </Button>
                             </CollapsibleContent>
                           </Collapsible>
+                          </div>
                         </CardContent>
                       </CollapsibleContent>
                     </Card>
