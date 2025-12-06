@@ -9,25 +9,29 @@ import {
   Check,
   Star,
   BadgeCheck,
-  Clock,
   Watch,
   TrendingUp,
-  Calendar,
-  MapPin,
   ChevronDown,
   ChevronUp,
   ExternalLink,
   Download,
   Share2,
-  Smartphone,
   Activity,
   Heart,
   Moon,
-  Zap,
   User,
   Quote,
+  X,
+  CheckCircle2,
+  BarChart3,
+  Calendar,
+  MapPin,
+  Smartphone,
+  Zap,
   Target,
   MessageSquare,
+  Clock,
+  Info,
 } from "lucide-react";
 import { MockTestimonial, ParticipantStory } from "@/lib/mock-data";
 
@@ -41,20 +45,27 @@ function ReputableSeal({ size = "lg" }: { size?: "sm" | "md" | "lg" }) {
 
   return (
     <div className={`${sizes[size].outer} relative`}>
-      {/* Outer ring animation */}
       <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#00D1C1] to-[#00A89D] animate-pulse opacity-20" />
-      {/* Main circle */}
       <div className="absolute inset-1 rounded-full bg-gradient-to-br from-[#00D1C1] to-[#00A89D] flex items-center justify-center shadow-lg">
         <div className="relative">
           <Shield className={`${sizes[size].shield} text-white`} />
           <Check className={`${sizes[size].check} text-white absolute inset-0 m-auto`} />
         </div>
       </div>
-      {/* Verified badge */}
       <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-white rounded-full px-2 py-0.5 shadow-md border border-[#00D1C1]/20">
         <span className="text-[10px] font-bold text-[#00D1C1] uppercase tracking-wide">Verified</span>
       </div>
     </div>
+  );
+}
+
+// Inline verification badge - small trust signal
+function InlineVerifiedBadge({ label }: { label?: string }) {
+  return (
+    <span className="inline-flex items-center gap-1 text-xs text-[#00D1C1] bg-[#00D1C1]/10 px-2 py-0.5 rounded-full">
+      <CheckCircle2 className="h-3 w-3" />
+      {label || "Verified"}
+    </span>
   );
 }
 
@@ -137,7 +148,7 @@ function MetricCard({
   );
 }
 
-// Villain Journey Progress component for verification page
+// Villain Journey Progress component
 function VillainJourneyProgress({ ratings, villainVariable }: {
   ratings: ParticipantStory["journey"]["villainRatings"];
   villainVariable: string
@@ -189,6 +200,182 @@ function VillainJourneyProgress({ ratings, villainVariable }: {
   );
 }
 
+// Comparison Table Component
+function ComparisonTable() {
+  const comparisons = [
+    { feature: "Real person verified", amazon: false, brand: false, reputable: true },
+    { feature: "Real participation tracked", amazon: false, brand: false, reputable: true },
+    { feature: "No incentive to lie", amazon: false, brand: false, reputable: true },
+    { feature: "Independent collection", amazon: false, brand: false, reputable: true },
+    { feature: "Brand cannot edit results", amazon: false, brand: false, reputable: true },
+  ];
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b">
+            <th className="text-left py-3 px-4 font-medium text-muted-foreground"></th>
+            <th className="text-center py-3 px-4 font-medium">
+              <div className="text-muted-foreground">Amazon Reviews</div>
+            </th>
+            <th className="text-center py-3 px-4 font-medium">
+              <div className="text-muted-foreground">Brand Testimonials</div>
+            </th>
+            <th className="text-center py-3 px-4 font-medium">
+              <div className="text-[#00D1C1]">Reputable</div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {comparisons.map((row) => (
+            <tr key={row.feature} className="border-b last:border-0">
+              <td className="py-3 px-4 text-muted-foreground">{row.feature}</td>
+              <td className="py-3 px-4 text-center">
+                {row.amazon ? (
+                  <Check className="h-4 w-4 text-green-500 mx-auto" />
+                ) : (
+                  <X className="h-4 w-4 text-red-400 mx-auto" />
+                )}
+              </td>
+              <td className="py-3 px-4 text-center">
+                {row.brand ? (
+                  <Check className="h-4 w-4 text-green-500 mx-auto" />
+                ) : (
+                  <X className="h-4 w-4 text-red-400 mx-auto" />
+                )}
+              </td>
+              <td className="py-3 px-4 text-center">
+                {row.reputable ? (
+                  <Check className="h-4 w-4 text-[#00D1C1] mx-auto" />
+                ) : (
+                  <X className="h-4 w-4 text-red-400 mx-auto" />
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// How We Verify Modal/Expandable Section
+function HowWeVerifySection({
+  testimonial,
+  formattedDataPoints,
+  studyDuration,
+  story,
+}: {
+  testimonial: MockTestimonial;
+  formattedDataPoints: string;
+  studyDuration: number;
+  story?: ParticipantStory;
+}) {
+  const [showRawData, setShowRawData] = useState(false);
+
+  return (
+    <div className="space-y-6 pt-4">
+      {/* Trust Stack - 4 pillars in a compact grid */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle2 className="h-5 w-5 text-green-600" />
+            <span className="font-medium text-green-900">Real Person</span>
+          </div>
+          <p className="text-sm text-green-800">
+            Identity verified via account authentication. Not a bot, paid reviewer, or brand employee.
+          </p>
+        </div>
+        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle2 className="h-5 w-5 text-green-600" />
+            <span className="font-medium text-green-900">Real Device</span>
+          </div>
+          <p className="text-sm text-green-800">
+            {testimonial.device} connected via API. {formattedDataPoints} data points collected automatically.
+          </p>
+        </div>
+        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle2 className="h-5 w-5 text-green-600" />
+            <span className="font-medium text-green-900">Real Participation</span>
+          </div>
+          <p className="text-sm text-green-800">
+            {story?.journey.durationDays || studyDuration} days active participation. Rebate given regardless of feedback.
+          </p>
+        </div>
+        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle2 className="h-5 w-5 text-green-600" />
+            <span className="font-medium text-green-900">Real Results</span>
+          </div>
+          <p className="text-sm text-green-800">
+            Device data collected automatically. Self-reports given with no incentive to exaggerate. The brand cannot edit any results.
+          </p>
+        </div>
+      </div>
+
+      {/* Comparison table */}
+      <div>
+        <h4 className="font-medium mb-3">How we&apos;re different from other reviews:</h4>
+        <ComparisonTable />
+      </div>
+
+      {/* About Reputable */}
+      <div className="p-4 bg-muted/30 rounded-lg border space-y-3">
+        <div className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-[#00D1C1]" />
+          <span className="font-medium">About Reputable Health</span>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          We&apos;re a third-party verification platform. Brands pay us to collect unbiased data — but they
+          cannot edit the results. If a product doesn&apos;t work, our data will show that.
+        </p>
+        <div className="flex items-center gap-4 text-sm">
+          <span className="font-medium">147+ studies</span>
+          <span className="text-muted-foreground">•</span>
+          <span className="font-medium">12,400+ participants</span>
+          <span className="text-muted-foreground">•</span>
+          <span className="font-medium">5 device integrations</span>
+        </div>
+      </div>
+
+      {/* Methodology */}
+      <div className="space-y-3 text-sm text-muted-foreground">
+        <h4 className="font-medium text-foreground">Our Methodology</h4>
+        <p>All biometric data was collected directly from the participant&apos;s {testimonial.device} via secure API. Results compare against a 7-day baseline period before product use.</p>
+        <p>Reputable Health independently verifies all data. Brands can choose which stories to feature but cannot alter the underlying data.</p>
+      </div>
+
+      {/* Raw data toggle */}
+      <div>
+        <button
+          onClick={() => setShowRawData(!showRawData)}
+          className="flex items-center gap-2 text-sm font-medium text-[#00D1C1] hover:underline"
+        >
+          {showRawData ? "Hide" : "View"} raw data sample
+          {showRawData ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </button>
+        {showRawData && (
+          <div className="mt-3 bg-gray-900 rounded-lg p-4 overflow-x-auto">
+            <pre className="text-xs text-gray-300">
+{`{
+  "verification_id": "${testimonial.verificationId}",
+  "participant_id": "anon_${testimonial.id}",
+  "device": "${testimonial.device}",
+  "data_points": ${formattedDataPoints.replace(/,/g, "")},
+  "verified_at": "2024-12-05T18:32:00Z",
+  "verification_hash": "sha256:7f83b1657..."
+}`}
+            </pre>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 interface VerificationPageProps {
   testimonial: MockTestimonial;
   studyTitle: string;
@@ -206,44 +393,13 @@ export function VerificationPage({
   studyId,
   story,
 }: VerificationPageProps) {
-  const [showMethodology, setShowMethodology] = useState(false);
-  const [showRawData, setShowRawData] = useState(false);
+  const [showHowWeVerify, setShowHowWeVerify] = useState(false);
 
-  // Mock timeline data
-  const timeline = [
-    {
-      date: "Nov 1, 2024",
-      title: "Study Enrollment",
-      description: "Participant enrolled and connected wearable device",
-      icon: Smartphone,
-    },
-    {
-      date: "Nov 1-7, 2024",
-      title: "Baseline Period",
-      description: "7 days of baseline data collected before product use",
-      icon: Activity,
-    },
-    {
-      date: "Nov 8, 2024",
-      title: "Product Started",
-      description: `Began using ${productName}`,
-      icon: Zap,
-    },
-    {
-      date: "Nov 8 - Dec 5, 2024",
-      title: "Study Period",
-      description: `${studyDuration} days of tracked product usage`,
-      icon: Calendar,
-    },
-    {
-      date: "Dec 5, 2024",
-      title: "Study Completed",
-      description: "Final data collected and verified",
-      icon: BadgeCheck,
-    },
-  ];
+  // Calculate data points
+  const dataPointsCollected = (story?.journey.durationDays || studyDuration) * 24 * 30;
+  const formattedDataPoints = dataPointsCollected.toLocaleString();
 
-  // Build detailed metrics from story data or fall back to mock data
+  // Build detailed metrics
   const detailedMetrics = story ? [
     story.wearableMetrics.deepSleepChange && {
       label: "Deep Sleep",
@@ -281,6 +437,18 @@ export function VerificationPage({
     { label: "Resting HR", before: "68 bpm", after: "62 bpm", change: "-9%", icon: Activity },
   ];
 
+  // Build timeline
+  const timeline = [
+    { date: "Nov 1, 2024", title: "Study Enrollment", description: "Participant enrolled and connected wearable device", icon: Smartphone },
+    { date: "Nov 1-7, 2024", title: "Baseline Period", description: "7 days of baseline data collected before product use", icon: Activity },
+    { date: "Nov 8, 2024", title: "Product Started", description: `Began using ${productName}`, icon: Zap },
+    { date: "Nov 8 - Dec 5, 2024", title: "Study Period", description: `${studyDuration} days of tracked product usage`, icon: Calendar },
+    { date: "Dec 5, 2024", title: "Study Completed", description: "Final data collected and verified", icon: BadgeCheck },
+  ];
+
+  void studyTitle; // Available for future use
+  void studyId; // Available for future use
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
@@ -311,39 +479,126 @@ export function VerificationPage({
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
-        {/* Verification Hero */}
+        {/* ===== SECTION 1: Credibility Hook ===== */}
+        {/* Quick establishment of "this is different" - answers "who is this?" */}
         <div className="text-center space-y-6">
           <div className="flex justify-center">
-            <ReputableSeal size="lg" />
+            <ReputableSeal size="md" />
           </div>
 
-          <div>
-            <h1 className="text-2xl font-bold mb-2">Verified Study Result</h1>
-            <p className="text-muted-foreground">
-              This result has been independently verified by Reputable Health
+          <div className="space-y-3">
+            <h1 className="text-2xl md:text-3xl font-bold">
+              This testimonial has been independently verified.
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Unlike reviews that can be faked or paid for, this is a{" "}
+              <span className="font-semibold text-foreground">real person</span> who participated for{" "}
+              <span className="font-semibold text-foreground">{story?.journey.durationDays || studyDuration} days</span>{" "}
+              with no incentive to exaggerate.
             </p>
           </div>
 
-          {/* Verification ID */}
-          <div className="inline-flex items-center gap-2 bg-[#00D1C1]/10 rounded-full px-4 py-2">
-            <BadgeCheck className="h-4 w-4 text-[#00D1C1]" />
-            <span className="text-sm font-medium">Verification ID: #{testimonial.verificationId}</span>
-          </div>
+          {/* Learn more link - for those who want to dig into HOW we verify */}
+          <button
+            onClick={() => setShowHowWeVerify(!showHowWeVerify)}
+            className="inline-flex items-center gap-2 text-sm text-[#00D1C1] hover:underline font-medium"
+          >
+            <Info className="h-4 w-4" />
+            {showHowWeVerify ? "Hide verification details" : "Learn how we verify"}
+            {showHowWeVerify ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </button>
+
+          {/* Expandable "How We Verify" section */}
+          {showHowWeVerify && (
+            <Card className="text-left mt-4">
+              <CardContent className="p-6">
+                <HowWeVerifySection
+                  testimonial={testimonial}
+                  formattedDataPoints={formattedDataPoints}
+                  studyDuration={studyDuration}
+                  story={story}
+                />
+              </CardContent>
+            </Card>
+          )}
         </div>
 
-        {/* Study Info Card */}
+        {/* ===== SECTION 1.5: Study Overview - Aggregate Stats ===== */}
+        {/* This is the key to transparency - even if brand picks which stories to feature,
+            they can't hide the aggregate truth */}
+        <Card className="border-[#00D1C1]/20 bg-gradient-to-r from-[#00D1C1]/5 to-transparent">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-[#00D1C1]/10 flex items-center justify-center">
+                  <BarChart3 className="h-5 w-5 text-[#00D1C1]" />
+                </div>
+                <div>
+                  <p className="font-semibold">Study Results</p>
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground">47 people</span> tried this product while wearing their device
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6">
+                <div className="text-center">
+                  <div className="flex items-center gap-1">
+                    <span className="text-2xl font-bold text-green-600">38</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">showed improvement</p>
+                </div>
+                <div className="h-8 w-px bg-border" />
+                <div className="text-center">
+                  <div className="flex items-center gap-1">
+                    <span className="text-2xl font-bold text-muted-foreground">9</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">showed no improvement</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Progress bar visualization */}
+            <div className="mt-4">
+              <div className="h-2 rounded-full bg-muted overflow-hidden flex">
+                <div className="h-full bg-green-500" style={{ width: '81%' }} />
+                <div className="h-full bg-gray-300" style={{ width: '19%' }} />
+              </div>
+            </div>
+
+            {/* Key trust message - emphasize the Trust Stack instead of just wearables */}
+            <div className="mt-4 pt-4 border-t">
+              <p className="text-sm text-center text-muted-foreground">
+                <span className="font-medium text-foreground">Real people. Real participation. No incentive to lie.</span>{" "}
+                Every participant receives the same rebate regardless of their feedback.
+              </p>
+            </div>
+
+            <div className="mt-4 flex items-center justify-center">
+              <a
+                href={`/verify/${testimonial.verificationId}/results`}
+                className="text-sm text-[#00D1C1] hover:underline font-medium flex items-center gap-1"
+              >
+                View all verified results
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ===== SECTION 2: The Participant - THE HERO ===== */}
         <Card>
           <CardContent className="p-6">
             <div className="flex items-start gap-6">
-              <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-[#00D1C1] to-[#00A89D] flex items-center justify-center text-white text-xl font-bold">
+              <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-[#00D1C1] to-[#00A89D] flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
                 {testimonial.initials}
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h2 className="text-xl font-semibold">{testimonial.participant}</h2>
-                  <BadgeCheck className="h-5 w-5 text-[#00D1C1]" />
+                  <InlineVerifiedBadge />
                 </div>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground mb-3">
                   <span className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
                     {testimonial.age} years old
@@ -378,7 +633,7 @@ export function VerificationPage({
           </CardContent>
         </Card>
 
-        {/* Participant Story Context - only shown if story data exists */}
+        {/* ===== SECTION 3: Participant Context ===== */}
         {story && (
           <Card>
             <CardHeader>
@@ -388,7 +643,6 @@ export function VerificationPage({
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Profile Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-muted/30 rounded-lg">
                   <p className="text-sm text-muted-foreground">Life Stage</p>
@@ -400,7 +654,6 @@ export function VerificationPage({
                 </div>
               </div>
 
-              {/* Tried Other Products */}
               {story.baseline.triedOther && story.baseline.triedOther !== "No" && (
                 <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
                   <p className="text-sm text-amber-800">
@@ -409,7 +662,6 @@ export function VerificationPage({
                 </div>
               )}
 
-              {/* Baseline Motivation */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm font-medium">
                   <Quote className="h-4 w-4 text-[#00D1C1]" />
@@ -422,7 +674,6 @@ export function VerificationPage({
                 </div>
               </div>
 
-              {/* Hoped Results */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm font-medium">
                   <Target className="h-4 w-4 text-[#00D1C1]" />
@@ -438,7 +689,7 @@ export function VerificationPage({
           </Card>
         )}
 
-        {/* Villain Variable Journey - only shown if story data exists */}
+        {/* ===== SECTION 4: Self-Reported Progress ===== */}
         {story && (
           <Card>
             <CardHeader>
@@ -456,7 +707,7 @@ export function VerificationPage({
           </Card>
         )}
 
-        {/* Key Quotes from Journey - only shown if story data exists */}
+        {/* ===== SECTION 5: Key Moments ===== */}
         {story && story.journey.keyQuotes.length > 0 && (
           <Card>
             <CardHeader>
@@ -485,7 +736,7 @@ export function VerificationPage({
           </Card>
         )}
 
-        {/* Study Details */}
+        {/* ===== SECTION 6: Study Details ===== */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Study Details</CardTitle>
@@ -507,21 +758,19 @@ export function VerificationPage({
             </div>
             <div className="mt-4 p-4 bg-[#00D1C1]/5 rounded-lg border border-[#00D1C1]/20">
               <p className="text-sm">
-                <strong>Study:</strong> {studyTitle}
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">
                 <strong>Product:</strong> {productName}
               </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Verified Results */}
+        {/* ===== SECTION 7: Verified Results ===== */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-[#00D1C1]" />
+              <BarChart3 className="h-5 w-5 text-[#00D1C1]" />
               Verified Results
+              <InlineVerifiedBadge label="Device Data" />
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -533,7 +782,7 @@ export function VerificationPage({
           </CardContent>
         </Card>
 
-        {/* Reported Benefits */}
+        {/* ===== SECTION 8: Reported Benefits ===== */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Reported Benefits</CardTitle>
@@ -553,7 +802,7 @@ export function VerificationPage({
           </CardContent>
         </Card>
 
-        {/* Participant Journey Timeline */}
+        {/* ===== SECTION 9: Participant Journey Timeline ===== */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
@@ -574,113 +823,11 @@ export function VerificationPage({
           </CardContent>
         </Card>
 
-        {/* Methodology (Collapsible) */}
-        <Card>
-          <button
-            onClick={() => setShowMethodology(!showMethodology)}
-            className="w-full p-6 flex items-center justify-between text-left hover:bg-muted/30 transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-[#00D1C1]" />
-              <span className="font-semibold">Verification Methodology</span>
-            </div>
-            {showMethodology ? (
-              <ChevronUp className="h-5 w-5 text-muted-foreground" />
-            ) : (
-              <ChevronDown className="h-5 w-5 text-muted-foreground" />
-            )}
-          </button>
-          {showMethodology && (
-            <CardContent className="pt-0 border-t">
-              <div className="space-y-4 text-sm text-muted-foreground">
-                <div>
-                  <h4 className="font-medium text-foreground mb-1">Data Collection</h4>
-                  <p>
-                    All biometric data was collected directly from the participant&apos;s {testimonial.device} via
-                    secure API integration. Data was synced automatically every 24 hours throughout the study period.
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-medium text-foreground mb-1">Baseline Comparison</h4>
-                  <p>
-                    Results are compared against a 7-day baseline period collected before product use began.
-                    This ensures accurate before/after comparison.
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-medium text-foreground mb-1">Verification Process</h4>
-                  <p>
-                    Reputable Health independently verified the authenticity of all data points.
-                    No data was provided or modified by the product manufacturer.
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-medium text-foreground mb-1">Privacy</h4>
-                  <p>
-                    Participant identity is protected. Only anonymized health metrics are displayed.
-                    Full data access requires participant consent.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          )}
-        </Card>
-
-        {/* Raw Data Preview (Collapsible) */}
-        <Card>
-          <button
-            onClick={() => setShowRawData(!showRawData)}
-            className="w-full p-6 flex items-center justify-between text-left hover:bg-muted/30 transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-[#00D1C1]" />
-              <span className="font-semibold">Raw Data Sample</span>
-            </div>
-            {showRawData ? (
-              <ChevronUp className="h-5 w-5 text-muted-foreground" />
-            ) : (
-              <ChevronDown className="h-5 w-5 text-muted-foreground" />
-            )}
-          </button>
-          {showRawData && (
-            <CardContent className="pt-0 border-t">
-              <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto">
-                <pre className="text-xs text-gray-300">
-{`{
-  "verification_id": "${testimonial.verificationId}",
-  "study_id": "${studyId}",
-  "participant_id": "anon_${testimonial.id}",
-  "device": "${testimonial.device}",
-  "data_points": 672,
-  "baseline_period": {
-    "start": "2024-11-01",
-    "end": "2024-11-07",
-    "avg_deep_sleep_min": 72,
-    "avg_sleep_score": 72
-  },
-  "study_period": {
-    "start": "2024-11-08",
-    "end": "2024-12-05",
-    "avg_deep_sleep_min": 89,
-    "avg_sleep_score": 83
-  },
-  "verified_at": "2024-12-05T18:32:00Z",
-  "verification_hash": "sha256:7f83b1657..."
-}`}
-                </pre>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                This is a sample of the verification data. Full data export available upon request.
-              </p>
-            </CardContent>
-          )}
-        </Card>
-
-        {/* QR Code for Mobile */}
+        {/* ===== SECTION 10: QR Code ===== */}
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-6">
-              <div className="h-24 w-24 bg-white rounded-lg border p-2 flex items-center justify-center">
+              <div className="h-24 w-24 bg-white rounded-lg border p-2 flex items-center justify-center flex-shrink-0">
                 <QRCodeSVG
                   value={`https://reputable.health/verify/${testimonial.verificationId}`}
                   size={80}
@@ -702,19 +849,19 @@ export function VerificationPage({
           </CardContent>
         </Card>
 
-        {/* Footer */}
+        {/* ===== Footer ===== */}
         <div className="text-center py-8 border-t">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Shield className="h-5 w-5 text-[#00D1C1]" />
             <span className="font-semibold text-[#00D1C1]">Reputable Health</span>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground mb-2">
             Independent verification for wellness products
           </p>
-          <a href="#" className="text-sm text-[#00D1C1] hover:underline flex items-center justify-center gap-1 mt-2">
-            Learn more about our verification process
-            <ExternalLink className="h-3 w-3" />
-          </a>
+          <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+            <BadgeCheck className="h-4 w-4 text-[#00D1C1]" />
+            Verification ID: #{testimonial.verificationId}
+          </div>
         </div>
       </div>
     </div>
@@ -741,6 +888,7 @@ export function VerificationBadge({
       <span className="text-xs font-medium text-[#00D1C1]">
         Verified #{verificationId}
       </span>
+      <span className="text-xs text-[#00D1C1]/70 hidden group-hover:inline">• Click to see proof</span>
       <ExternalLink className="h-3 w-3 text-[#00D1C1] opacity-0 group-hover:opacity-100 transition-opacity" />
     </button>
   );
