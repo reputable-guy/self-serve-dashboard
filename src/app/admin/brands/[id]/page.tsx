@@ -15,6 +15,7 @@ import {
   ChevronRight,
   MoreHorizontal,
   Eye,
+  Pencil,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -145,16 +146,24 @@ export default function BrandDetailPage() {
           </div>
         </div>
         <div className="flex gap-2">
+          <Link href={`/admin/brands/${brand.id}/edit`}>
+            <Button variant="outline">
+              <Pencil className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
+          </Link>
           <Link href={`/admin/brands/${brand.id}/view-as`}>
             <Button variant="outline">
               <Eye className="h-4 w-4 mr-2" />
               View as Brand
             </Button>
           </Link>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Create Study
-          </Button>
+          <Link href={`/admin/studies/new?brand=${brand.id}`}>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Create Study
+            </Button>
+          </Link>
         </div>
       </div>
 

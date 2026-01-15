@@ -315,10 +315,14 @@ function StudyEditContent() {
   const handleSave = async () => {
     setIsSaving(true);
 
+    // Find the brand name for the selected brand
+    const selectedBrand = brands.find((b) => b.id === formData.brandId);
+
     // Update the study in Zustand store (persisted to localStorage)
     updateStudy(studyId, {
       name: formData.productName,
       brandId: formData.brandId,
+      brandName: selectedBrand?.name || study?.brandName || "Unknown Brand",
       productDescription: formData.productDescription,
       productImage: formData.productImage,
       category: formData.category,
