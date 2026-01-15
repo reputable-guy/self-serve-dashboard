@@ -286,7 +286,7 @@ const MOCK_STUDIES: Record<
     brandId: string;
     category: string;
     categoryLabel: string;
-    status: "active" | "completed" | "draft";
+    status: "active" | "completed" | "draft" | "archived";
     participants: number;
     targetParticipants: number;
     startDate: string;

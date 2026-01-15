@@ -36,6 +36,14 @@ export interface Study {
     note: string;
     value: string;
   }>;
+  // Legacy fields for backward compatibility
+  productName?: string;
+  durationDays?: number;
+  requiredDevice?: string;
+  villainVariable?: string;
+  villainQuestionDays?: number[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  customQuestions?: any[];
   createdAt: string;
   updatedAt: string;
 }
@@ -235,6 +243,7 @@ interface StudiesStore {
   updateStudy: (id: string, updates: Partial<Study>) => void;
   deleteStudy: (id: string) => void;
   getStudyById: (id: string) => Study | undefined;
+  getStudy: (id: string) => Study | undefined; // Alias for legacy pages
   getStudiesByBrandId: (brandId: string) => Study[];
   launchStudy: (id: string) => void;
   resetToSeedData: () => void;
@@ -286,6 +295,11 @@ export const useStudiesStore = create<StudiesStore>()(
         return get().studies.find((study) => study.id === id);
       },
 
+      // Alias for legacy pages
+      getStudy: (id) => {
+        return get().studies.find((study) => study.id === id);
+      },
+
       getStudiesByBrandId: (brandId) => {
         return get().studies.filter((study) => study.brandId === brandId);
       },
@@ -317,3 +331,6 @@ export const useStudiesStore = create<StudiesStore>()(
     }
   )
 );
+
+// Alias for backward compatibility with legacy pages
+export const useStudies = useStudiesStore;

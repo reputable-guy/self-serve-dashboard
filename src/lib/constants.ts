@@ -106,6 +106,8 @@ export const STUDY_STATUSES = {
   "filling-fast": { bg: "bg-yellow-500/20", text: "text-yellow-400", label: "Filling Fast" },
   full: { bg: "bg-orange-500/20", text: "text-orange-400", label: "Full" },
   completed: { bg: "bg-blue-500/20", text: "text-blue-400", label: "Completed" },
+  active: { bg: "bg-green-500/20", text: "text-green-400", label: "Active" },
+  archived: { bg: "bg-gray-500/20", text: "text-gray-400", label: "Archived" },
 } as const;
 
 export type StudyStatus = keyof typeof STUDY_STATUSES;
