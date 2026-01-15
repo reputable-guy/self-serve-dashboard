@@ -55,8 +55,7 @@ interface ParticipantStory {
 }
 
 function generateMockParticipants(
-  studyCategory: string,
-  _studyId: string
+  studyCategory: string
 ): ParticipantStory[] {
   const categoryMetrics: Record<
     string,
@@ -627,7 +626,7 @@ function OverviewTab({
 }) {
   const progressPercent =
     (study.participants / study.targetParticipants) * 100;
-  const participants = generateMockParticipants(study.category, study.id);
+  const participants = generateMockParticipants(study.category);
 
   return (
     <div className="space-y-6">
@@ -843,7 +842,7 @@ function OverviewTab({
 }
 
 function ResultsTab({ study }: { study: (typeof MOCK_STUDIES)["study-1"] }) {
-  const participants = generateMockParticipants(study.category, study.id);
+  const participants = generateMockParticipants(study.category);
   const insights = getParticipantInsights(study.category);
 
   return (

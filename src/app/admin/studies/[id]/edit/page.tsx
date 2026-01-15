@@ -346,7 +346,6 @@ function StudyEditContent() {
     router.push(`/admin/studies/${studyId}`);
   };
 
-  const _selectedBrand = brands.find((b) => b.id === formData.brandId);
   const selectedCategory = CATEGORY_CONFIGS.find((c) => c.value === formData.category);
   const tierInfo = formData.autoConfig ? getTierDisplayInfo(formData.autoConfig.tier) : null;
   const heartbeats = calculateHeartbeats(formData.rebateAmount);
