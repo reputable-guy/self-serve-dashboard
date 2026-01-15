@@ -13,7 +13,6 @@ import {
   Sparkles,
   Save,
   Watch,
-  FileText,
   Heart,
   Loader2,
   Image as ImageIcon,
@@ -347,7 +346,7 @@ function StudyEditContent() {
     router.push(`/admin/studies/${studyId}`);
   };
 
-  const selectedBrand = brands.find((b) => b.id === formData.brandId);
+  const _selectedBrand = brands.find((b) => b.id === formData.brandId);
   const selectedCategory = CATEGORY_CONFIGS.find((c) => c.value === formData.category);
   const tierInfo = formData.autoConfig ? getTierDisplayInfo(formData.autoConfig.tier) : null;
   const heartbeats = calculateHeartbeats(formData.rebateAmount);

@@ -32,7 +32,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useBrandsStore } from "@/lib/brands-store";
-import { useStudiesStore, Study } from "@/lib/studies-store";
+import { useStudiesStore } from "@/lib/studies-store";
 import { CATEGORY_CONFIGS } from "@/lib/assessments";
 import { StudyDetailsFullPreview } from "@/components/study-details-full-preview";
 import { StudyPreview } from "@/components/study-preview";
@@ -56,7 +56,7 @@ interface ParticipantStory {
 
 function generateMockParticipants(
   studyCategory: string,
-  studyId: string
+  _studyId: string
 ): ParticipantStory[] {
   const categoryMetrics: Record<
     string,
