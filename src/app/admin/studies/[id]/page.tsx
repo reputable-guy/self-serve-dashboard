@@ -32,6 +32,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useBrandsStore } from "@/lib/brands-store";
+import { useStudiesStore, Study } from "@/lib/studies-store";
 import { CATEGORY_CONFIGS } from "@/lib/assessments";
 import { StudyDetailsFullPreview } from "@/components/study-details-full-preview";
 import { StudyPreview } from "@/components/study-preview";
@@ -1271,7 +1272,21 @@ export default function AdminStudyDetailPage() {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [showPreview, setShowPreview] = useState(false);
 
-  const study = MOCK_STUDIES[id];
+  // First try the store, then fall back to legacy MOCK_STUDIES
+  const storeStudy = useStudiesStore((state) => state.getStudyById(id));
+  const legacyStudy = MOCK_STUDIES[id];
+
+  // Convert store study to the format expected by this page
+  const study = storeStudy
+    ? {
+        ...storeStudy,
+        startDate: storeStudy.startDate ? new Date(storeStudy.startDate).toISOString().split('T')[0] : "",
+        endDate: storeStudy.endDate ? new Date(storeStudy.endDate).toISOString().split('T')[0] : "",
+        avgImprovement: Math.floor(Math.random() * 20) + 15, // Generate random for new studies
+        completionRate: storeStudy.status === 'completed' ? 100 : Math.floor(Math.random() * 20) + 75,
+      }
+    : legacyStudy;
+
   const brand = useBrandsStore((state) =>
     study ? state.getBrandById(study.brandId) : undefined
   );

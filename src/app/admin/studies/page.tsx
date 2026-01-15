@@ -11,6 +11,7 @@ import {
   MoreHorizontal,
   ExternalLink,
   Building2,
+  RotateCcw,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,89 +29,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getAllBrands } from "@/lib/roles";
-
-// Mock all studies - categoryKey is used for sample verification routes
-const mockAllStudies = [
-  {
-    id: "study-1",
-    name: "SleepWell Premium",
-    brandId: "brand-acme",
-    brandName: "Acme Supplements",
-    category: "Sleep",
-    categoryKey: "sleep",
-    status: "active",
-    participants: 45,
-    targetParticipants: 50,
-    startDate: new Date("2024-11-01"),
-    rebatePerParticipant: 50,
-  },
-  {
-    id: "study-2",
-    name: "Recovery Plus",
-    brandId: "brand-acme",
-    brandName: "Acme Supplements",
-    category: "Recovery",
-    categoryKey: "recovery",
-    status: "active",
-    participants: 32,
-    targetParticipants: 40,
-    startDate: new Date("2024-11-15"),
-    rebatePerParticipant: 45,
-  },
-  {
-    id: "study-3",
-    name: "Calm Drops",
-    brandId: "brand-zenwell",
-    brandName: "ZenWell",
-    category: "Stress",
-    categoryKey: "stress",
-    status: "active",
-    participants: 28,
-    targetParticipants: 35,
-    startDate: new Date("2024-11-10"),
-    rebatePerParticipant: 55,
-  },
-  {
-    id: "study-4",
-    name: "Energy Boost",
-    brandId: "brand-vitality",
-    brandName: "Vitality Labs",
-    category: "Energy",
-    categoryKey: "energy",
-    status: "active",
-    participants: 40,
-    targetParticipants: 50,
-    startDate: new Date("2024-10-20"),
-    rebatePerParticipant: 50,
-  },
-  {
-    id: "study-5",
-    name: "Deep Rest Formula",
-    brandId: "brand-acme",
-    brandName: "Acme Supplements",
-    category: "Sleep",
-    categoryKey: "sleep",
-    status: "completed",
-    participants: 50,
-    targetParticipants: 50,
-    startDate: new Date("2024-09-01"),
-    rebatePerParticipant: 50,
-  },
-  {
-    id: "study-6",
-    name: "Focus Flow",
-    brandId: "brand-zenwell",
-    brandName: "ZenWell",
-    category: "Focus",
-    categoryKey: "focus",
-    status: "completed",
-    participants: 45,
-    targetParticipants: 50,
-    startDate: new Date("2024-08-15"),
-    rebatePerParticipant: 60,
-  },
-];
+import { useBrandsStore } from "@/lib/brands-store";
+import { useStudiesStore } from "@/lib/studies-store";
 
 function getStatusColor(status: string) {
   switch (status) {
@@ -130,13 +50,16 @@ export default function AdminStudiesPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [brandFilter, setBrandFilter] = useState<string>("all");
 
-  const brands = getAllBrands();
+  // Get data from stores
+  const brands = useBrandsStore((state) => state.brands);
+  const studies = useStudiesStore((state) => state.studies);
+  const resetStudies = useStudiesStore((state) => state.resetToSeedData);
 
-  const filteredStudies = mockAllStudies.filter((study) => {
+  const filteredStudies = studies.filter((study) => {
     const matchesSearch =
       study.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       study.brandName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      study.category.toLowerCase().includes(searchQuery.toLowerCase());
+      study.categoryLabel.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesStatus =
       statusFilter === "all" || study.status === statusFilter;
@@ -147,10 +70,9 @@ export default function AdminStudiesPage() {
     return matchesSearch && matchesStatus && matchesBrand;
   });
 
-  const activeCount = mockAllStudies.filter((s) => s.status === "active").length;
-  const completedCount = mockAllStudies.filter(
-    (s) => s.status === "completed"
-  ).length;
+  const activeCount = studies.filter((s) => s.status === "active").length;
+  const completedCount = studies.filter((s) => s.status === "completed").length;
+  const draftCount = studies.filter((s) => s.status === "draft").length;
 
   return (
     <div className="p-8 space-y-6">
@@ -162,16 +84,22 @@ export default function AdminStudiesPage() {
             Manage all studies across all brands
           </p>
         </div>
-        <Link href="/admin/studies/new">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Create Study
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={resetStudies}>
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Reset Demo Data
           </Button>
-        </Link>
+          <Link href="/admin/studies/new">
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Create Study
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -179,7 +107,7 @@ export default function AdminStudiesPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockAllStudies.length}</div>
+            <div className="text-2xl font-bold">{studies.length}</div>
           </CardContent>
         </Card>
         <Card>
@@ -202,6 +130,16 @@ export default function AdminStudiesPage() {
             <div className="text-2xl font-bold text-blue-600">
               {completedCount}
             </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Drafts
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-500">{draftCount}</div>
           </CardContent>
         </Card>
       </div>
@@ -291,7 +229,7 @@ export default function AdminStudiesPage() {
                         {study.brandName}
                       </Link>
                     </td>
-                    <td className="p-4 text-sm">{study.category}</td>
+                    <td className="p-4 text-sm">{study.categoryLabel}</td>
                     <td className="p-4 text-center text-sm">
                       <span className="font-medium">{study.participants}</span>
                       <span className="text-muted-foreground">
@@ -299,13 +237,15 @@ export default function AdminStudiesPage() {
                       </span>
                     </td>
                     <td className="p-4 text-sm">
-                      ${study.rebatePerParticipant}
+                      ${study.rebateAmount}
                     </td>
                     <td className="p-4 text-sm text-muted-foreground">
-                      {study.startDate.toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })}
+                      {study.startDate
+                        ? new Date(study.startDate).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          })
+                        : "Not started"}
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-1">
@@ -329,6 +269,11 @@ export default function AdminStudiesPage() {
                             <DropdownMenuItem asChild>
                               <Link href={`/admin/studies/${study.id}`}>
                                 View Details
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/admin/studies/${study.id}/edit`}>
+                                Edit Study
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
@@ -360,6 +305,14 @@ export default function AdminStudiesPage() {
                   ? "Try adjusting your filters"
                   : "Create your first study to get started"}
               </p>
+              {!searchQuery && statusFilter === "all" && brandFilter === "all" && (
+                <Link href="/admin/studies/new">
+                  <Button className="mt-4">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Study
+                  </Button>
+                </Link>
+              )}
             </div>
           )}
         </CardContent>

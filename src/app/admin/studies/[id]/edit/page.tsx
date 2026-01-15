@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { getAllBrands, Brand } from "@/lib/roles";
+import { useStudiesStore } from "@/lib/studies-store";
 import {
   CATEGORY_CONFIGS,
   getTierDisplayInfo,
@@ -82,141 +83,6 @@ const WHAT_YOULL_GET_ICON_OPTIONS = [
   { value: "chart", label: "Chart", icon: BarChart3, color: "text-blue-400" },
 ];
 
-// Mock study data - matches the list in admin studies page
-const MOCK_STUDIES_DATA: Record<string, {
-  id: string;
-  name: string;
-  brandId: string;
-  category: string;
-  categoryLabel: string;
-  status: "active" | "completed" | "draft";
-  participants: number;
-  targetParticipants: number;
-  rebateAmount: number;
-  hasWearables: boolean;
-  tier: number;
-  productImage: string;
-  productDescription: string;
-  whatYoullDiscover: string[];
-  dailyRoutine: string;
-  howItWorks: string;
-}> = {
-  "study-1": {
-    id: "study-1",
-    name: "SleepWell Premium",
-    brandId: "brand-acme",
-    category: "sleep",
-    categoryLabel: "Sleep",
-    status: "active",
-    participants: 45,
-    targetParticipants: 50,
-    rebateAmount: 50,
-    hasWearables: true,
-    tier: 1,
-    productImage: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=800&h=600&fit=crop",
-    productDescription: "Natural sleep supplement formulated to improve sleep quality and duration",
-    whatYoullDiscover: [
-      "How SleepWell Premium affects your sleep quality and duration",
-      "Whether you wake up feeling more refreshed",
-      "Changes in your deep sleep and REM patterns",
-      "Your overall sleep consistency over 28 days",
-    ],
-    dailyRoutine: "Take SleepWell Premium before bed. Your wearable tracks sleep automatically. Quick daily check-in takes ~30 seconds.",
-    howItWorks: "SleepWell Premium contains a blend of natural ingredients including magnesium, L-theanine, and melatonin that work together to support healthy sleep patterns.",
-  },
-  "study-2": {
-    id: "study-2",
-    name: "Recovery Plus",
-    brandId: "brand-acme",
-    category: "recovery",
-    categoryLabel: "Recovery",
-    status: "active",
-    participants: 32,
-    targetParticipants: 40,
-    rebateAmount: 45,
-    hasWearables: true,
-    tier: 1,
-    productImage: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=600&fit=crop",
-    productDescription: "Advanced recovery formula for post-workout muscle recovery",
-    whatYoullDiscover: [
-      "How Recovery Plus affects your post-workout recovery",
-      "Changes in your HRV and recovery scores",
-      "Whether muscle soreness decreases faster",
-      "Your overall recovery consistency",
-    ],
-    dailyRoutine: "Take Recovery Plus after workouts. Your wearable tracks recovery metrics automatically. Quick daily check-in takes ~30 seconds.",
-    howItWorks: "Recovery Plus contains BCAAs, electrolytes, and anti-inflammatory compounds designed to accelerate post-workout recovery and reduce muscle soreness.",
-  },
-  "study-3": {
-    id: "study-3",
-    name: "Calm Focus Formula",
-    brandId: "brand-acme",
-    category: "stress",
-    categoryLabel: "Stress Management",
-    status: "active",
-    participants: 28,
-    targetParticipants: 35,
-    rebateAmount: 55,
-    hasWearables: true,
-    tier: 2,
-    productImage: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&h=600&fit=crop",
-    productDescription: "Natural stress relief supplement for better focus and calm",
-    whatYoullDiscover: [
-      "How Calm Focus Formula affects your daily stress levels",
-      "Whether your focus and concentration improve",
-      "Changes in your HRV indicating stress resilience",
-      "Your stress patterns over 28 days",
-    ],
-    dailyRoutine: "Take Calm Focus Formula each morning. Complete weekly stress assessment (~5 min). Your wearable provides supporting HRV data.",
-    howItWorks: "Calm Focus Formula combines adaptogenic herbs like ashwagandha and rhodiola with L-theanine to support stress resilience and mental clarity.",
-  },
-  "study-4": {
-    id: "study-4",
-    name: "Energy Boost Complex",
-    brandId: "brand-vitality",
-    category: "energy",
-    categoryLabel: "Energy & Vitality",
-    status: "active",
-    participants: 22,
-    targetParticipants: 30,
-    rebateAmount: 50,
-    hasWearables: false,
-    tier: 3,
-    productImage: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=800&h=600&fit=crop",
-    productDescription: "All-day energy supplement without jitters or crashes",
-    whatYoullDiscover: [
-      "How Energy Boost Complex affects your daily energy levels",
-      "Whether afternoon crashes become less frequent",
-      "Changes in your overall vitality and motivation",
-      "Your energy consistency throughout the day",
-    ],
-    dailyRoutine: "Complete a weekly energy assessment (~5 min). Track your energy levels through quick check-ins. Wearable optional but adds supporting data.",
-    howItWorks: "Energy Boost Complex uses sustained-release B vitamins, CoQ10, and natural caffeine from green tea to provide steady energy without the crash.",
-  },
-  "study-5": {
-    id: "study-5",
-    name: "Gut Health Pro",
-    brandId: "brand-acme",
-    category: "gut",
-    categoryLabel: "Gut Health",
-    status: "completed",
-    participants: 50,
-    targetParticipants: 50,
-    rebateAmount: 50,
-    hasWearables: false,
-    tier: 4,
-    productImage: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=600&fit=crop",
-    productDescription: "Probiotic blend for digestive wellness and gut balance",
-    whatYoullDiscover: [
-      "How Gut Health Pro affects your digestive comfort",
-      "Whether bloating and discomfort decrease",
-      "Changes in your gut health symptoms",
-      "Your digestive patterns over 28 days",
-    ],
-    dailyRoutine: "Take Gut Health Pro daily. Complete weekly gut health assessment (~5 min). Track symptoms through quick check-ins.",
-    howItWorks: "Gut Health Pro contains 50 billion CFU of clinically-studied probiotic strains plus prebiotic fiber to support digestive health and microbiome balance.",
-  },
-};
 
 interface EditFormData {
   brandId: string;
@@ -288,6 +154,11 @@ function StudyEditContent() {
   const [hasChanges, setHasChanges] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<number, boolean>>({});
 
+  // Use Zustand store for study data
+  const getStudyById = useStudiesStore((state) => state.getStudyById);
+  const updateStudy = useStudiesStore((state) => state.updateStudy);
+  const study = getStudyById(studyId);
+
   const [formData, setFormData] = useState<EditFormData>({
     brandId: "",
     productName: "",
@@ -307,18 +178,21 @@ function StudyEditContent() {
     whatYoullGet: [],
   });
 
-  // Load study data
+  // Load study data from Zustand store
   useEffect(() => {
-    const study = MOCK_STUDIES_DATA[studyId];
     if (study) {
       const autoConfig = getStudyAutoConfig(study.category);
-      const defaultDoSections = generateDefaultWhatYoullDo(
+
+      // Use stored whatYoullDoSections if available, otherwise generate defaults
+      const doSections = study.whatYoullDoSections || generateDefaultWhatYoullDo(
         study.name,
         study.categoryLabel,
         28,
         study.tier
       );
-      const defaultGetItems = generateDefaultWhatYoullGet(
+
+      // Use stored whatYoullGet if available, otherwise generate defaults
+      const getItems = study.whatYoullGet || generateDefaultWhatYoullGet(
         study.name,
         study.categoryLabel,
         study.rebateAmount,
@@ -334,23 +208,23 @@ function StudyEditContent() {
         rebateAmount: study.rebateAmount,
         targetParticipants: study.targetParticipants,
         autoConfig,
-        studyTitle: `${study.name} Study`,
-        hookQuestion: `Can ${study.name} improve your ${study.categoryLabel.toLowerCase()}?`,
+        studyTitle: study.studyTitle || `${study.name} Study`,
+        hookQuestion: study.hookQuestion || `Can ${study.name} improve your ${study.categoryLabel.toLowerCase()}?`,
         whatYoullDiscover: study.whatYoullDiscover,
         howItWorksTitle: `What is ${study.name}?`,
         howItWorksDescription: study.howItWorks,
         allowNonWearable: !study.hasWearables,
-        whatYoullDoSections: defaultDoSections,
-        whatYoullGet: defaultGetItems,
+        whatYoullDoSections: doSections,
+        whatYoullGet: getItems,
       });
 
       // Expand all sections by default
       const expanded: Record<number, boolean> = {};
-      defaultDoSections.forEach((_, i) => (expanded[i] = true));
+      doSections.forEach((_, i) => (expanded[i] = true));
       setExpandedSections(expanded);
     }
     setIsLoading(false);
-  }, [studyId]);
+  }, [study]);
 
   // Update autoConfig when category changes
   useEffect(() => {
@@ -441,11 +315,35 @@ function StudyEditContent() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Update the study in Zustand store (persisted to localStorage)
+    updateStudy(studyId, {
+      name: formData.productName,
+      brandId: formData.brandId,
+      productDescription: formData.productDescription,
+      productImage: formData.productImage,
+      category: formData.category,
+      categoryKey: formData.category,
+      categoryLabel: selectedCategory?.label || formData.category,
+      rebateAmount: formData.rebateAmount,
+      targetParticipants: formData.targetParticipants,
+      tier: formData.autoConfig?.tier || 1,
+      hasWearables: !formData.allowNonWearable,
+      studyTitle: formData.studyTitle,
+      hookQuestion: formData.hookQuestion,
+      whatYoullDiscover: formData.whatYoullDiscover,
+      dailyRoutine: formData.whatYoullDoSections.length > 0
+        ? `Follow your personalized ${formData.whatYoullDoSections.length}-step routine.`
+        : "Complete your daily check-ins and follow the study routine.",
+      howItWorks: formData.howItWorksDescription,
+      whatYoullDoSections: formData.whatYoullDoSections,
+      whatYoullGet: formData.whatYoullGet,
+    });
+
+    // Small delay for UX feedback
+    await new Promise((resolve) => setTimeout(resolve, 300));
     setIsSaving(false);
     setHasChanges(false);
-    alert("Study saved successfully! (Mock - would save to backend)");
     router.push(`/admin/studies/${studyId}`);
   };
 
@@ -462,7 +360,7 @@ function StudyEditContent() {
     );
   }
 
-  if (!MOCK_STUDIES_DATA[studyId]) {
+  if (!study) {
     return (
       <div className="p-8 text-center">
         <h2 className="text-lg font-medium">Study not found</h2>

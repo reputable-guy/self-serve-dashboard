@@ -33,7 +33,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { getAllBrands, Brand } from "@/lib/roles";
+import { useBrandsStore } from "@/lib/brands-store";
+import { useStudiesStore } from "@/lib/studies-store";
 import {
   CATEGORY_CONFIGS,
   getTierDisplayInfo,
@@ -48,6 +49,10 @@ import {
 } from "@/lib/study-generator";
 import { calculateHeartbeats, formatRebateWithHeartbeats } from "@/lib/heartbeat-calculator";
 import { generateSampleStory, getSampleHeadline } from "@/lib/sample-story";
+import {
+  generateDefaultWhatYoullDo,
+  generateDefaultWhatYoullGet,
+} from "@/components/study-details-full-preview";
 
 // ============================================
 // TYPES
@@ -83,7 +88,8 @@ function AdminStudyCreationContent() {
   const preselectedBrandId = searchParams.get("brand");
 
   const [step, setStep] = useState(1);
-  const [brands] = useState<Brand[]>(getAllBrands());
+  const brands = useBrandsStore((state) => state.brands);
+  const addStudy = useStudiesStore((state) => state.addStudy);
 
   const [formData, setFormData] = useState<StudyFormData>({
     brandId: preselectedBrandId || "",
@@ -774,13 +780,56 @@ function AdminStudyCreationContent() {
         ) : (
           <Button
             onClick={() => {
-              // TODO: Actually create the study
-              alert("Study created! (Mock - would save to backend)");
-              router.push("/admin/studies");
+              // Save to store
+              const selectedBrandData = brands.find((b) => b.id === formData.brandId);
+              const tier = formData.autoConfig?.tier || 1;
+              const categoryLabel = selectedCategory?.label || formData.category;
+
+              // Generate structured content for the study
+              const whatYoullDoSections = generateDefaultWhatYoullDo(
+                formData.productName,
+                categoryLabel,
+                28,
+                tier
+              );
+              const whatYoullGet = generateDefaultWhatYoullGet(
+                formData.productName,
+                categoryLabel,
+                formData.rebateAmount,
+                28
+              );
+
+              const study = addStudy({
+                name: formData.productName,
+                brandId: formData.brandId,
+                brandName: selectedBrandData?.name || "Unknown Brand",
+                category: formData.category,
+                categoryKey: formData.category,
+                categoryLabel: categoryLabel,
+                status: "draft",
+                tier: tier,
+                targetParticipants: formData.targetParticipants,
+                startDate: null,
+                endDate: null,
+                rebateAmount: formData.rebateAmount,
+                hasWearables: tier <= 2,
+                productDescription: formData.howItWorks,
+                productImage: "",
+                hookQuestion: `Can ${formData.productName} improve your ${categoryLabel.toLowerCase()}?`,
+                studyTitle: `${formData.productName} Study`,
+                whatYoullDiscover: formData.whatYoullDiscover,
+                dailyRoutine: formData.dailyRoutine,
+                howItWorks: formData.howItWorks,
+                whatYoullDoSections: whatYoullDoSections,
+                whatYoullGet: whatYoullGet,
+              });
+
+              // Redirect to the new study
+              router.push(`/admin/studies/${study.id}`);
             }}
           >
             <Rocket className="h-4 w-4 mr-2" />
-            Launch Study
+            Create Study
           </Button>
         )}
       </div>
