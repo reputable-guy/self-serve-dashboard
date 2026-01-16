@@ -822,6 +822,8 @@ function AdminStudyCreationContent() {
                 howItWorks: formData.howItWorks,
                 whatYoullDoSections: whatYoullDoSections,
                 whatYoullGet: whatYoullGet,
+                // Lock assessment version at study creation time
+                assessmentVersion: selectedCategory?.assessmentVersion || "1.0",
               });
 
               // Redirect to the new study

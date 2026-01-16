@@ -36,6 +36,8 @@ export interface Study {
     note: string;
     value: string;
   }>;
+  // Assessment version - locked when study is created
+  assessmentVersion: string;  // e.g., "1.0" - the version of assessment used by this study
   // Legacy fields for backward compatibility
   productName?: string;
   durationDays?: number;
@@ -77,6 +79,7 @@ const SEED_STUDIES: Study[] = [
     ],
     dailyRoutine: "Take SleepWell Premium before bed. Your wearable tracks sleep automatically. Quick daily check-in takes ~30 seconds.",
     howItWorks: "SleepWell Premium contains a blend of natural ingredients including magnesium, L-theanine, and melatonin that work together to support healthy sleep patterns.",
+    assessmentVersion: "1.0",
     createdAt: "2024-10-15T00:00:00.000Z",
     updatedAt: "2024-10-15T00:00:00.000Z",
   },
@@ -108,6 +111,7 @@ const SEED_STUDIES: Study[] = [
     ],
     dailyRoutine: "Take Recovery Plus after workouts. Your wearable tracks recovery metrics automatically.",
     howItWorks: "Recovery Plus contains BCAAs, electrolytes, and anti-inflammatory compounds designed to accelerate post-workout recovery.",
+    assessmentVersion: "1.0",
     createdAt: "2024-11-01T00:00:00.000Z",
     updatedAt: "2024-11-01T00:00:00.000Z",
   },
@@ -139,6 +143,7 @@ const SEED_STUDIES: Study[] = [
     ],
     dailyRoutine: "Take Calm Focus Formula each morning. Complete weekly stress assessment.",
     howItWorks: "Calm Focus Formula combines adaptogenic herbs like ashwagandha and rhodiola with L-theanine to support stress resilience.",
+    assessmentVersion: "1.0",
     createdAt: "2024-11-05T00:00:00.000Z",
     updatedAt: "2024-11-05T00:00:00.000Z",
   },
@@ -170,6 +175,7 @@ const SEED_STUDIES: Study[] = [
     ],
     dailyRoutine: "Take Energy Boost Complex in the morning. Complete weekly energy assessment.",
     howItWorks: "Energy Boost Complex uses sustained-release B vitamins, CoQ10, and natural caffeine from green tea.",
+    assessmentVersion: "1.0",
     createdAt: "2024-11-15T00:00:00.000Z",
     updatedAt: "2024-11-15T00:00:00.000Z",
   },
@@ -201,6 +207,7 @@ const SEED_STUDIES: Study[] = [
     ],
     dailyRoutine: "Take Gut Health Pro daily. Complete weekly gut health assessment.",
     howItWorks: "Gut Health Pro contains 50 billion CFU of clinically-studied probiotic strains plus prebiotic fiber.",
+    assessmentVersion: "1.0",
     createdAt: "2024-08-15T00:00:00.000Z",
     updatedAt: "2024-09-29T00:00:00.000Z",
   },
@@ -232,6 +239,7 @@ const SEED_STUDIES: Study[] = [
     ],
     dailyRoutine: "Take Focus Flow in the morning. Complete weekly focus assessment.",
     howItWorks: "Focus Flow combines lion's mane, bacopa, and alpha-GPC for enhanced cognitive function.",
+    assessmentVersion: "1.0",
     createdAt: "2024-08-01T00:00:00.000Z",
     updatedAt: "2024-09-12T00:00:00.000Z",
   },

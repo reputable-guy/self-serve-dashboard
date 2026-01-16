@@ -30,6 +30,8 @@ export interface ReputableAssessment {
   shortName: string;
   description: string;
   inspiredBy: string;
+  version: string;        // e.g., "1.0" - locked once used by a study
+  versionDate: string;    // ISO date when this version was created
   questions: AssessmentQuestion[];
   checkInDays: number[];
   requiresPhotos?: boolean;
@@ -95,6 +97,7 @@ export interface CategoryConfig {
   label: string;
   tier: TierLevel;
   assessmentId: string;
+  assessmentVersion: string;  // Version of assessment to use (e.g., "1.0")
   requiresPhotos: boolean;
   wearableMetrics: string[];
   checkInDays: number[];
@@ -408,6 +411,8 @@ export const REPUTABLE_ASSESSMENTS: ReputableAssessment[] = [
     shortName: "RSA",
     description: "Measures sleep quality, duration, and daytime impact",
     inspiredBy: "Inspired by PSQI, ISI",
+    version: "1.0",
+    versionDate: "2025-01-15",
     checkInDays: [1, 30],
     questions: [
       {
@@ -470,6 +475,8 @@ export const REPUTABLE_ASSESSMENTS: ReputableAssessment[] = [
     shortName: "RRA",
     description: "Measures physical recovery and readiness",
     inspiredBy: "Inspired by REST-Q, Perceived Recovery Status Scale",
+    version: "1.0",
+    versionDate: "2025-01-15",
     checkInDays: [1, 30],
     questions: [
       {
@@ -520,6 +527,8 @@ export const REPUTABLE_ASSESSMENTS: ReputableAssessment[] = [
     shortName: "RFA",
     description: "Measures fitness levels and physical activity",
     inspiredBy: "Inspired by IPAQ, Godin Leisure-Time Exercise Questionnaire",
+    version: "1.0",
+    versionDate: "2025-01-15",
     checkInDays: [1, 30],
     questions: [
       {
@@ -573,6 +582,8 @@ export const REPUTABLE_ASSESSMENTS: ReputableAssessment[] = [
     shortName: "RSS",
     description: "Measures perceived stress levels and coping ability",
     inspiredBy: "Inspired by PSS-10 (Perceived Stress Scale)",
+    version: "1.0",
+    versionDate: "2025-01-15",
     checkInDays: [1, 7, 14, 21, 28],
     questions: [
       {
@@ -642,6 +653,8 @@ export const REPUTABLE_ASSESSMENTS: ReputableAssessment[] = [
     shortName: "REA",
     description: "Measures energy levels and vitality",
     inspiredBy: "Inspired by PROMIS Fatigue, Chalder Fatigue Scale, SF-36 Vitality",
+    version: "1.0",
+    versionDate: "2025-01-15",
     checkInDays: [1, 7, 14, 21, 28],
     questions: [
       {
@@ -706,6 +719,8 @@ export const REPUTABLE_ASSESSMENTS: ReputableAssessment[] = [
     shortName: "RFC",
     description: "Measures mental clarity, focus, and cognitive function",
     inspiredBy: "Inspired by PROMIS Cognitive Function, CFQ",
+    version: "1.0",
+    versionDate: "2025-01-15",
     checkInDays: [1, 7, 14, 21, 28],
     questions: [
       {
@@ -781,6 +796,8 @@ export const REPUTABLE_ASSESSMENTS: ReputableAssessment[] = [
     shortName: "RMA",
     description: "Measures emotional wellbeing and mood stability",
     inspiredBy: "Inspired by PANAS, POMS",
+    version: "1.0",
+    versionDate: "2025-01-15",
     checkInDays: [1, 7, 14, 21, 28],
     questions: [
       {
@@ -868,6 +885,8 @@ export const REPUTABLE_ASSESSMENTS: ReputableAssessment[] = [
     shortName: "RAA",
     description: "Measures anxiety levels and worry patterns",
     inspiredBy: "Inspired by GAD-7, STAI",
+    version: "1.0",
+    versionDate: "2025-01-15",
     checkInDays: [1, 7, 14, 21, 28],
     questions: [
       {
@@ -935,6 +954,8 @@ export const REPUTABLE_ASSESSMENTS: ReputableAssessment[] = [
     shortName: "RPA",
     description: "Measures pain levels and impact on daily life",
     inspiredBy: "Inspired by BPI (Brief Pain Inventory), McGill Pain Questionnaire",
+    version: "1.0",
+    versionDate: "2025-01-15",
     checkInDays: [1, 7, 14, 21, 28],
     questions: [
       {
@@ -1006,6 +1027,8 @@ export const REPUTABLE_ASSESSMENTS: ReputableAssessment[] = [
     shortName: "RSK",
     description: "Measures skin health and appearance",
     inspiredBy: "Inspired by Skindex-16, DLQI",
+    version: "1.0",
+    versionDate: "2025-01-15",
     checkInDays: [1, 14, 28],
     requiresPhotos: true,
     questions: [
@@ -1079,6 +1102,8 @@ export const REPUTABLE_ASSESSMENTS: ReputableAssessment[] = [
     shortName: "RGA",
     description: "Measures digestive comfort and gut health",
     inspiredBy: "Inspired by GSRS, IBS-SSS",
+    version: "1.0",
+    versionDate: "2025-01-15",
     checkInDays: [1, 7, 14, 21, 28],
     questions: [
       {
@@ -1162,6 +1187,8 @@ export const REPUTABLE_ASSESSMENTS: ReputableAssessment[] = [
     shortName: "RIA",
     description: "Measures perceived immune health and resilience",
     inspiredBy: "Inspired by WURSS, general wellness scales",
+    version: "1.0",
+    versionDate: "2025-01-15",
     checkInDays: [1, 14, 28],
     questions: [
       {
@@ -1230,6 +1257,8 @@ export const REPUTABLE_ASSESSMENTS: ReputableAssessment[] = [
     shortName: "RHA",
     description: "Measures hair health and appearance",
     inspiredBy: "Inspired by Kingsley Hair Assessment",
+    version: "1.0",
+    versionDate: "2025-01-15",
     checkInDays: [1, 14, 28],
     requiresPhotos: true,
     questions: [
@@ -1297,6 +1326,8 @@ export const REPUTABLE_ASSESSMENTS: ReputableAssessment[] = [
     shortName: "RWA",
     description: "Measures weight management and metabolism",
     inspiredBy: "Inspired by SF-36 items, custom wellness measures",
+    version: "1.0",
+    versionDate: "2025-01-15",
     checkInDays: [1, 7, 14, 21, 28],
     questions: [
       {
@@ -1369,6 +1400,7 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
     label: "Sleep",
     tier: 1,
     assessmentId: "reputable-sleep",
+    assessmentVersion: "1.0",
     requiresPhotos: false,
     wearableMetrics: ["sleep-quality", "deep-sleep", "rem-sleep", "resting-heart-rate"],
     checkInDays: [1, 30],
@@ -1380,6 +1412,7 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
     label: "Recovery",
     tier: 1,
     assessmentId: "reputable-recovery",
+    assessmentVersion: "1.0",
     requiresPhotos: false,
     wearableMetrics: ["recovery-score", "hrv", "resting-heart-rate"],
     checkInDays: [1, 30],
@@ -1391,6 +1424,7 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
     label: "Fitness & Activity",
     tier: 1,
     assessmentId: "reputable-fitness",
+    assessmentVersion: "1.0",
     requiresPhotos: false,
     wearableMetrics: ["steps", "energy", "recovery-score"],
     checkInDays: [1, 30],
@@ -1404,6 +1438,7 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
     label: "Stress",
     tier: 2,
     assessmentId: "reputable-stress",
+    assessmentVersion: "1.0",
     requiresPhotos: false,
     wearableMetrics: ["hrv", "resting-heart-rate", "stress"],
     checkInDays: [1, 7, 14, 21, 28],
@@ -1417,6 +1452,7 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
     label: "Energy & Vitality",
     tier: 3,
     assessmentId: "reputable-energy",
+    assessmentVersion: "1.0",
     requiresPhotos: false,
     wearableMetrics: ["steps", "energy", "sleep-quality"],
     checkInDays: [1, 7, 14, 21, 28],
@@ -1428,6 +1464,7 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
     label: "Focus & Cognition",
     tier: 3,
     assessmentId: "reputable-focus",
+    assessmentVersion: "1.0",
     requiresPhotos: false,
     wearableMetrics: ["sleep-quality", "hrv"],
     checkInDays: [1, 7, 14, 21, 28],
@@ -1439,6 +1476,7 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
     label: "Mood",
     tier: 3,
     assessmentId: "reputable-mood",
+    assessmentVersion: "1.0",
     requiresPhotos: false,
     wearableMetrics: ["sleep-quality", "steps", "hrv"],
     checkInDays: [1, 7, 14, 21, 28],
@@ -1450,6 +1488,7 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
     label: "Anxiety",
     tier: 3,
     assessmentId: "reputable-anxiety",
+    assessmentVersion: "1.0",
     requiresPhotos: false,
     wearableMetrics: ["hrv", "resting-heart-rate", "sleep-quality"],
     checkInDays: [1, 7, 14, 21, 28],
@@ -1461,6 +1500,7 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
     label: "Pain & Comfort",
     tier: 3,
     assessmentId: "reputable-pain",
+    assessmentVersion: "1.0",
     requiresPhotos: false,
     wearableMetrics: ["steps", "sleep-quality"],
     checkInDays: [1, 7, 14, 21, 28],
@@ -1474,6 +1514,7 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
     label: "Skin & Beauty",
     tier: 4,
     assessmentId: "reputable-skin",
+    assessmentVersion: "1.0",
     requiresPhotos: true,
     wearableMetrics: ["sleep-quality"],
     checkInDays: [1, 14, 28],
@@ -1485,6 +1526,7 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
     label: "Gut & Digestion",
     tier: 4,
     assessmentId: "reputable-gut",
+    assessmentVersion: "1.0",
     requiresPhotos: false,
     wearableMetrics: ["stress", "sleep-quality"],
     checkInDays: [1, 7, 14, 21, 28],
@@ -1496,6 +1538,7 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
     label: "Immunity",
     tier: 4,
     assessmentId: "reputable-immunity",
+    assessmentVersion: "1.0",
     requiresPhotos: false,
     wearableMetrics: ["hrv", "sleep-quality"],
     checkInDays: [1, 14, 28],
@@ -1507,6 +1550,7 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
     label: "Hair",
     tier: 4,
     assessmentId: "reputable-hair",
+    assessmentVersion: "1.0",
     requiresPhotos: true,
     wearableMetrics: [],
     checkInDays: [1, 14, 28],
@@ -1518,6 +1562,7 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
     label: "Weight & Metabolism",
     tier: 4,
     assessmentId: "reputable-weight",
+    assessmentVersion: "1.0",
     requiresPhotos: false,
     wearableMetrics: ["steps", "energy"],
     checkInDays: [1, 7, 14, 21, 28],
@@ -1529,6 +1574,7 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
     label: "Sexual Wellness",
     tier: 4,
     assessmentId: "reputable-weight", // Using weight assessment as placeholder (user didn't provide specific libido questions)
+    assessmentVersion: "1.0",
     requiresPhotos: false,
     wearableMetrics: ["sleep-quality", "stress"],
     checkInDays: [1, 7, 14, 21, 28],

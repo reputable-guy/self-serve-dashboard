@@ -29,6 +29,7 @@ import Link from "next/link";
 import {
   usePlatformSettingsStore,
   validateDistribution,
+  DEFAULT_DISTRIBUTION,
 } from "@/lib/platform-settings-store";
 import {
   REPUTABLE_ASSESSMENTS,
@@ -69,12 +70,8 @@ export default function AdminSettingsPage() {
 
   // Platform settings from Zustand store
   const {
-    heartbeatsPerDollar,
-    defaultStudyDuration,
     distributionFormula,
     trustStackPillars,
-    setHeartbeatsPerDollar,
-    setDefaultStudyDuration,
     setDistributionFormula,
     updateTrustPillar,
     resetToDefaults,
@@ -113,19 +110,15 @@ export default function AdminSettingsPage() {
   // Handle reset
   const handleReset = () => {
     resetToDefaults();
-    setLocalDistribution({
-      dailySync: 70,
-      baseline: 10,
-      finalSurvey: 10,
-      weeklyBonus: 10,
-    });
+    setLocalDistribution(DEFAULT_DISTRIBUTION);
   };
 
   const distributionTotal =
-    localDistribution.dailySync +
-    localDistribution.baseline +
-    localDistribution.finalSurvey +
-    localDistribution.weeklyBonus;
+    localDistribution.onboarding +
+    localDistribution.dailyCheckIn +
+    localDistribution.weeklyAssessment +
+    localDistribution.endpointAssessment +
+    localDistribution.completionBonus;
 
   return (
     <div className="p-8 space-y-6">
@@ -421,101 +414,253 @@ export default function AdminSettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Heartbeat Settings - Now Editable */}
+        {/* Heartbeat Reward System - Milestone-Based Distribution */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Heart className="h-5 w-5 text-[#00D1C1]" />
-              Heartbeat (Points) Configuration
+              Rebate Distribution
             </CardTitle>
             <CardDescription>
-              Configure how rebates are converted to heartbeats for participant rewards
+              How participant rebates are distributed as heartbeats throughout the 28-day study
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="heartbeats-per-dollar">Heartbeats per Dollar</Label>
-                <Input
-                  id="heartbeats-per-dollar"
-                  type="number"
-                  value={heartbeatsPerDollar}
-                  onChange={(e) => setHeartbeatsPerDollar(parseInt(e.target.value) || 10)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  $50 rebate = {50 * heartbeatsPerDollar} heartbeats
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="study-duration">Default Study Duration (days)</Label>
-                <Input
-                  id="study-duration"
-                  type="number"
-                  value={defaultStudyDuration}
-                  onChange={(e) => setDefaultStudyDuration(parseInt(e.target.value) || 28)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Standard study length in days
-                </p>
+          <CardContent className="space-y-6">
+            {/* Heartbeat Conversion - Read Only Info */}
+            <div className="p-3 rounded-lg bg-muted/50 border">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Heart className="h-4 w-4 text-[#00D1C1]" />
+                  <span className="text-sm font-medium">Heartbeat Value</span>
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  1 heartbeat = 0.05¢ &nbsp;•&nbsp; 2,000 heartbeats = $1
+                </span>
               </div>
             </div>
 
-            <div className="pt-4 border-t">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="text-sm font-medium">Distribution Formula</h4>
-                <span className={`text-xs ${distributionTotal === 100 ? 'text-green-600' : 'text-red-600'}`}>
-                  Total: {distributionTotal}%
-                  {distributionTotal !== 100 && ' (must equal 100%)'}
+            {/* Visual Split Bar */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">Distribution Model</span>
+                <span className={`text-xs ${distributionTotal === 100 ? 'text-green-600' : 'text-red-600 font-medium'}`}>
+                  {distributionTotal === 100 ? '✓ Totals 100%' : `⚠ Total: ${distributionTotal}% (must equal 100%)`}
                 </span>
               </div>
-              <div className="grid grid-cols-4 gap-3 text-sm">
-                <div className="p-3 rounded-lg border">
-                  <Label className="text-muted-foreground text-xs">Daily Sync</Label>
-                  <Input
-                    type="number"
-                    value={localDistribution.dailySync}
-                    onChange={(e) => setLocalDistribution({
-                      ...localDistribution,
-                      dailySync: parseInt(e.target.value) || 0
-                    })}
-                    className="mt-1 h-8"
-                  />
+              <div className="h-10 rounded-lg overflow-hidden flex">
+                <div
+                  className="bg-blue-500 flex items-center justify-center text-white text-xs font-medium transition-all"
+                  style={{ width: `${localDistribution.onboarding + localDistribution.dailyCheckIn + localDistribution.weeklyAssessment + localDistribution.endpointAssessment}%` }}
+                >
+                  Progressive {localDistribution.onboarding + localDistribution.dailyCheckIn + localDistribution.weeklyAssessment + localDistribution.endpointAssessment}%
                 </div>
-                <div className="p-3 rounded-lg border">
-                  <Label className="text-muted-foreground text-xs">Baseline</Label>
-                  <Input
-                    type="number"
-                    value={localDistribution.baseline}
-                    onChange={(e) => setLocalDistribution({
-                      ...localDistribution,
-                      baseline: parseInt(e.target.value) || 0
-                    })}
-                    className="mt-1 h-8"
-                  />
+                <div
+                  className="bg-green-500 flex items-center justify-center text-white text-xs font-medium transition-all"
+                  style={{ width: `${localDistribution.completionBonus}%` }}
+                >
+                  Completion Bonus {localDistribution.completionBonus}%
                 </div>
-                <div className="p-3 rounded-lg border">
-                  <Label className="text-muted-foreground text-xs">Final Survey</Label>
-                  <Input
-                    type="number"
-                    value={localDistribution.finalSurvey}
-                    onChange={(e) => setLocalDistribution({
-                      ...localDistribution,
-                      finalSurvey: parseInt(e.target.value) || 0
-                    })}
-                    className="mt-1 h-8"
-                  />
+              </div>
+              <div className="flex justify-between mt-1 text-xs text-muted-foreground">
+                <span>Earned throughout study</span>
+                <span>Earned when completed</span>
+              </div>
+            </div>
+
+            {/* Progressive Milestones */}
+            <div className="pt-4 border-t">
+              <div className="flex items-center gap-2 mb-3">
+                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                  Progressive Earnings
+                </Badge>
+                <span className="text-xs text-muted-foreground">
+                  Keep participants engaged with steady progress
+                </span>
+              </div>
+
+              <div className="grid grid-cols-4 gap-3">
+                {/* Onboarding */}
+                <div className="p-3 rounded-lg border bg-blue-50/30">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-blue-700">Onboarding</span>
+                    <span className="text-xs text-muted-foreground">Day 1</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Input
+                      type="number"
+                      value={localDistribution.onboarding}
+                      onChange={(e) => setLocalDistribution({
+                        ...localDistribution,
+                        onboarding: parseInt(e.target.value) || 0
+                      })}
+                      className="h-8 text-center"
+                    />
+                    <span className="text-sm font-medium">%</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Baseline assessment
+                  </p>
                 </div>
-                <div className="p-3 rounded-lg border">
-                  <Label className="text-muted-foreground text-xs">Weekly Bonus</Label>
-                  <Input
-                    type="number"
-                    value={localDistribution.weeklyBonus}
-                    onChange={(e) => setLocalDistribution({
-                      ...localDistribution,
-                      weeklyBonus: parseInt(e.target.value) || 0
-                    })}
-                    className="mt-1 h-8"
-                  />
+
+                {/* Daily Check-ins */}
+                <div className="p-3 rounded-lg border bg-blue-50/30">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-blue-700">Daily Check-ins</span>
+                    <span className="text-xs text-muted-foreground">÷ 28 days</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Input
+                      type="number"
+                      value={localDistribution.dailyCheckIn}
+                      onChange={(e) => setLocalDistribution({
+                        ...localDistribution,
+                        dailyCheckIn: parseInt(e.target.value) || 0
+                      })}
+                      className="h-8 text-center"
+                    />
+                    <span className="text-sm font-medium">%</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {(localDistribution.dailyCheckIn / 28).toFixed(2)}% per day
+                  </p>
+                </div>
+
+                {/* Weekly Surveys */}
+                <div className="p-3 rounded-lg border bg-blue-50/30">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-blue-700">Weekly Surveys</span>
+                    <span className="text-xs text-muted-foreground">÷ 4 weeks</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Input
+                      type="number"
+                      value={localDistribution.weeklyAssessment}
+                      onChange={(e) => setLocalDistribution({
+                        ...localDistribution,
+                        weeklyAssessment: parseInt(e.target.value) || 0
+                      })}
+                      className="h-8 text-center"
+                    />
+                    <span className="text-sm font-medium">%</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {(localDistribution.weeklyAssessment / 4).toFixed(2)}% per week
+                  </p>
+                </div>
+
+                {/* Final Survey */}
+                <div className="p-3 rounded-lg border bg-blue-50/30">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-blue-700">Final Survey</span>
+                    <span className="text-xs text-muted-foreground">Day 28</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Input
+                      type="number"
+                      value={localDistribution.endpointAssessment}
+                      onChange={(e) => setLocalDistribution({
+                        ...localDistribution,
+                        endpointAssessment: parseInt(e.target.value) || 0
+                      })}
+                      className="h-8 text-center"
+                    />
+                    <span className="text-sm font-medium">%</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Endpoint assessment
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Completion Bonus */}
+            <div className="pt-4 border-t">
+              <div className="flex items-center gap-2 mb-3">
+                <Badge className="bg-green-100 text-green-700 border-green-200">
+                  Completion Bonus
+                </Badge>
+                <span className="text-xs text-muted-foreground">
+                  The &quot;big prize&quot; that drives 80%+ completion rates
+                </span>
+              </div>
+
+              <div className="p-4 rounded-lg border-2 border-green-200 bg-green-50/30">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-green-700">
+                      Unlocked when participant completes all study requirements
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Requires: baseline + 70% daily check-ins + final assessment
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Input
+                      type="number"
+                      value={localDistribution.completionBonus}
+                      onChange={(e) => setLocalDistribution({
+                        ...localDistribution,
+                        completionBonus: parseInt(e.target.value) || 0
+                      })}
+                      className="w-20 h-10 text-center text-lg font-bold"
+                    />
+                    <span className="text-lg font-bold text-green-700">%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Preview with Example */}
+            <div className="pt-4 border-t">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium">Example: $50 Rebate</span>
+                <span className="text-xs text-muted-foreground">100,000 heartbeats total</span>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-blue-700">Progressive Earnings</p>
+                  <div className="space-y-1 text-xs">
+                    <div className="flex justify-between">
+                      <span>Onboarding (Day 1)</span>
+                      <span className="font-medium">${(50 * localDistribution.onboarding / 100).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Daily check-ins ({(50 * localDistribution.dailyCheckIn / 100 / 28).toFixed(2)}/day × 28)</span>
+                      <span className="font-medium">${(50 * localDistribution.dailyCheckIn / 100).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Weekly surveys ({(50 * localDistribution.weeklyAssessment / 100 / 4).toFixed(2)}/wk × 4)</span>
+                      <span className="font-medium">${(50 * localDistribution.weeklyAssessment / 100).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Final survey (Day 28)</span>
+                      <span className="font-medium">${(50 * localDistribution.endpointAssessment / 100).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between pt-1 border-t">
+                      <span className="text-muted-foreground">Max if dropped</span>
+                      <span className="font-medium text-blue-700">
+                        ${(50 * (localDistribution.onboarding + localDistribution.dailyCheckIn + localDistribution.weeklyAssessment + localDistribution.endpointAssessment) / 100).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-green-700">Completion Bonus</p>
+                  <div className="p-3 rounded-lg bg-green-50 border border-green-200">
+                    <div className="flex items-center gap-2">
+                      <Heart className="h-5 w-5 text-green-600" />
+                      <span className="text-2xl font-bold text-green-700">
+                        ${(50 * localDistribution.completionBonus / 100).toFixed(2)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-green-600 mt-1">
+                      Awarded at final ceremony
+                    </p>
+                  </div>
+                  <div className="flex justify-between text-xs pt-2">
+                    <span className="font-medium">Total on completion</span>
+                    <span className="font-bold text-green-700">$50.00</span>
+                  </div>
                 </div>
               </div>
             </div>

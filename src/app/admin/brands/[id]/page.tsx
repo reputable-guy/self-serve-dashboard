@@ -16,6 +16,8 @@ import {
   MoreHorizontal,
   Eye,
   Pencil,
+  Receipt,
+  DollarSign,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -146,6 +148,12 @@ export default function BrandDetailPage() {
           </div>
         </div>
         <div className="flex gap-2">
+          <Link href={`/admin/brands/${brand.id}/billing`}>
+            <Button variant="outline">
+              <Receipt className="h-4 w-4 mr-2" />
+              Billing
+            </Button>
+          </Link>
           <Link href={`/admin/brands/${brand.id}/edit`}>
             <Button variant="outline">
               <Pencil className="h-4 w-4 mr-2" />
@@ -168,7 +176,7 @@ export default function BrandDetailPage() {
       </div>
 
       {/* Info Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -226,6 +234,23 @@ export default function BrandDetailPage() {
             </p>
           </CardContent>
         </Card>
+
+        <Link href={`/admin/brands/${brand.id}/billing`} className="block">
+          <Card className="h-full hover:border-primary/50 transition-colors cursor-pointer">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <DollarSign className="h-4 w-4" />
+                Rebates
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="font-medium">View billing</p>
+              <p className="text-sm text-muted-foreground">
+                Rebates & payments
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       {/* Studies */}
