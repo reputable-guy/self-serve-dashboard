@@ -41,7 +41,6 @@ import {
   getLYFEfuelStudyStats,
 } from "@/lib/lyfefuel-demo-stories";
 import { SENSATE_REAL_STORIES } from "@/lib/sensate-real-data";
-import type { ParticipantStory } from "@/lib/types";
 
 // ============================================
 // TYPES & MOCK DATA
