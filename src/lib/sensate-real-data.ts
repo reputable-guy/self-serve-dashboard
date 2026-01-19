@@ -1338,8 +1338,6 @@ export function categorizeParticipant(story: ParticipantStory): "positive" | "ne
 
   // Objective improvement: at least one metric improved by 5%+
   const hasObjectiveImprovement = hrvChange >= 5 || deepSleepChange >= 5;
-  // Objective decline: both metrics declined
-  const hasObjectiveDecline = hrvChange < 0 && deepSleepChange < 0;
 
   // Subjective: NPS >= 7 is positive, <= 4 is negative
   const isSubjectivePositive = nps >= 7;

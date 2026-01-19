@@ -768,7 +768,6 @@ function OverviewTab({
   const studyAvgImprovement = isSensateRealStudy ? SENSATE_METRICS.avgHrvChange : study.avgImprovement;
   const studyMetricName = isSensateRealStudy ? "HRV" : "primary metric";
 
-  const progressPercent = (studyParticipants / studyTargetParticipants) * 100;
   const participants = generateMockParticipants(study.category);
 
   return (
