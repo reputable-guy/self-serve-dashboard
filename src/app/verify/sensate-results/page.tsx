@@ -175,8 +175,8 @@ export default function SensateResultsPage() {
               <p className="font-medium mb-2">How we categorize results:</p>
               <ul className="space-y-1 text-muted-foreground">
                 <li><span className="text-green-600 font-medium">Improved:</span> At least one metric (HRV or Deep Sleep) improved by ≥5% AND NPS ≥ 7</li>
-                <li><span className="text-yellow-600 font-medium">Neutral:</span> Mixed results — metrics didn't improve but satisfaction was okay, or vice versa</li>
-                <li><span className="text-red-500 font-medium">Didn't improve:</span> Low satisfaction (NPS ≤ 4) regardless of metrics</li>
+                <li><span className="text-yellow-600 font-medium">Neutral:</span> Mixed results — objective improvement but low satisfaction, or vice versa</li>
+                <li><span className="text-red-500 font-medium">Didn't improve:</span> Low satisfaction (NPS ≤ 4) AND no objective improvement</li>
               </ul>
             </div>
           </CardContent>

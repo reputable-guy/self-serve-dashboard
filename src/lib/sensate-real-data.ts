@@ -1350,11 +1350,11 @@ export function categorizeParticipant(story: ParticipantStory): "positive" | "ne
   // Also positive if strong objective improvement even with neutral subjective
   if ((hrvChange >= 10 || deepSleepChange >= 10) && nps >= 6) return "positive";
 
-  // Negative: objective decline OR strong subjective dissatisfaction
-  if (hasObjectiveDecline && isSubjectiveNegative) return "negative";
-  if (isSubjectiveNegative) return "negative";
+  // Negative: low NPS AND no objective improvement
+  // (If someone has objective improvement but low NPS, that's mixed/neutral)
+  if (isSubjectiveNegative && !hasObjectiveImprovement) return "negative";
 
-  // Everything else is neutral
+  // Everything else is neutral (including mixed results like objective improvement + low NPS)
   return "neutral";
 }
 
