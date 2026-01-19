@@ -62,6 +62,7 @@ interface VerificationPageProps {
   hasWearable?: boolean;
   productDescription?: string;
   productImage?: string;
+  brandLogo?: string;
   protocol?: StudyProtocol;
   studyStats?: StudyStats;
 }
@@ -115,6 +116,7 @@ export function VerificationPage({
   hasWearable: hasWearableProp,
   productDescription: _productDescription,
   productImage: _productImage,
+  brandLogo,
   protocol,
   studyStats,
 }: VerificationPageProps) {
@@ -225,21 +227,20 @@ export function VerificationPage({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Header - Product-Focused */}
+      {/* Header - Reputable Branded (platform owner) */}
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
+              <img
+                src="/logos/reputable-logo.png"
+                alt="Reputable"
+                className="h-6 w-auto mb-2"
+              />
               <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-1">
-                Verified Testimonial
+                Independent Verification
               </p>
               <h1 className="text-xl font-bold text-gray-900">{productName}</h1>
-              <div className="flex items-center gap-2 mt-1">
-                <Shield className="h-4 w-4 text-[#00D1C1]" />
-                <p className="text-sm text-muted-foreground">
-                  Independent verification by <span className="text-[#00D1C1] font-medium">Reputable Health</span>
-                </p>
-              </div>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm">
@@ -343,6 +344,18 @@ export function VerificationPage({
             </div>
           </CardContent>
         </Card>
+
+        {/* Product Being Verified - clearly frames brand as SUBJECT not owner */}
+        {brandLogo && (
+          <div className="flex items-center gap-3 px-4 py-3 bg-muted/30 rounded-lg border border-muted">
+            <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Product Verified:</span>
+            <img
+              src={brandLogo}
+              alt="Product brand"
+              className="h-6 w-auto object-contain opacity-70"
+            />
+          </div>
+        )}
 
         {/* SECTION 2: PERSONALIZED RESULTS */}
         {renderVerifiedResults(tier, story, hasActualWearableMetrics, detailedMetrics, hasWearable, studyDuration, firstName, productName)}

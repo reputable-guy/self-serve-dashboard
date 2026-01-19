@@ -396,6 +396,7 @@ export default function VerifyPage() {
         productName: "Sensate Vagus Nerve Device",
         productDescription: "The 10-Minute Vagus Nerve Device Shown to Cut Stress by 48% and Boost Sleep. Sensate uses gentle sound vibrations to quickly calm your nervous system.",
         productImage: "/images/sensate-device.png",
+        brandLogo: "/logos/sensate-logo.png",
       };
 
       const realProtocol: StudyProtocol = {
@@ -462,6 +463,7 @@ export default function VerifyPage() {
           hasWearable={true}
           productDescription={realStudyInfo.productDescription}
           productImage={realStudyInfo.productImage}
+          brandLogo={realStudyInfo.brandLogo}
           protocol={realProtocol}
           studyStats={sensateStats}
         />
