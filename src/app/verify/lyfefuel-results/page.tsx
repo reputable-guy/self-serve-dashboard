@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
   TrendingUp,
@@ -10,14 +11,26 @@ import {
   Star,
   ExternalLink,
   CheckCircle2,
-  Users
+  Users,
+  Loader2,
+  Instagram
 } from "lucide-react";
 import Link from "next/link";
+import { useState, useRef, useCallback } from "react";
 import {
   getSortedLyfefuelStories,
   getLyfefuelStudyStats,
-  categorizeLyfefuelParticipant
+  categorizeLyfefuelParticipant,
+  getLyfefuelStarParticipant,
+  getLyfefuelActualAverages
 } from "@/lib/lyfefuel-real-data";
+import {
+  InstagramSlide1Hook,
+  InstagramSlide2Result,
+  InstagramSlide3Star,
+  InstagramSlide4Proof
+} from "@/components/instagram-story-card";
+import { downloadInstagramCarousel } from "@/lib/instagram-download";
 
 // Get the sorted stories and categorize them
 const allStories = getSortedLyfefuelStories();
@@ -98,9 +111,89 @@ function ParticipantCard({ story, category }: { story: typeof allStories[0], cat
   );
 }
 
+// Get study data
+const starParticipant = getLyfefuelStarParticipant();
+const actualAverages = getLyfefuelActualAverages();
+
 export default function LyfefuelResultsPage() {
+  const [isDownloading, setIsDownloading] = useState(false);
+  const carouselContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleDownloadInstagram = useCallback(async () => {
+    if (isDownloading) return;
+    setIsDownloading(true);
+
+    try {
+      // Wait for slides to render
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      const container = carouselContainerRef.current;
+      if (!container) {
+        throw new Error("Carousel container not found");
+      }
+
+      const slideElements = Array.from(
+        container.querySelectorAll('[data-slide]')
+      ) as HTMLElement[];
+
+      if (slideElements.length === 0) {
+        throw new Error("No slide elements found");
+      }
+
+      await downloadInstagramCarousel(
+        {
+          productName: "LYFEfuel Daily Essentials",
+          brandName: "LYFEfuel",
+          studyDuration: 24,
+          totalParticipants: actualAverages.totalParticipants,
+          avgActivityChange: actualAverages.avgActivityChange,
+          avgStepsChange: actualAverages.avgStepsChange,
+          starParticipant: starParticipant,
+        },
+        slideElements
+      );
+    } catch (error) {
+      console.error("Failed to download Instagram carousel:", error);
+      alert("Failed to generate Instagram carousel. Please try again.");
+    } finally {
+      setIsDownloading(false);
+    }
+  }, [isDownloading]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      {/* Hidden carousel rendering area for Instagram export */}
+      <div
+        ref={carouselContainerRef}
+        style={{
+          position: "absolute",
+          left: "-9999px",
+          top: 0,
+          overflow: "hidden",
+        }}
+        aria-hidden="true"
+      >
+        <InstagramSlide1Hook
+          productName="LYFEfuel Daily Essentials"
+          studyDuration={24}
+          totalParticipants={actualAverages.totalParticipants}
+          productImageUrl="/images/lyfefuel-product-lifestyle.png"
+        />
+        <InstagramSlide2Result
+          avgActivityChange={actualAverages.avgActivityChange}
+          totalParticipants={actualAverages.totalParticipants}
+        />
+        <InstagramSlide3Star
+          starParticipant={starParticipant}
+          productImageUrl="/images/lyfefuel-product-lifestyle.png"
+        />
+        <InstagramSlide4Proof
+          totalParticipants={actualAverages.totalParticipants}
+          brandName="LYFEfuel"
+          brandLogoUrl="/logos/lyfefuel-logo.png"
+        />
+      </div>
+
       {/* Header */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-6 py-4">
@@ -108,18 +201,38 @@ export default function LyfefuelResultsPage() {
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back
           </Link>
-          <div className="flex items-center gap-4">
-            <img
-              src="/logos/lyfefuel-logo.png"
-              alt="LYFEfuel"
-              className="h-8 w-auto"
-            />
-            <div>
-              <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
-                Study Results
-              </p>
-              <h1 className="text-xl font-bold text-gray-900">LYFEfuel Daily Essentials Energy Study</h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <img
+                src="/logos/lyfefuel-logo.png"
+                alt="LYFEfuel"
+                className="h-8 w-auto"
+              />
+              <div>
+                <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                  Study Results
+                </p>
+                <h1 className="text-xl font-bold text-gray-900">LYFEfuel Daily Essentials Energy Study</h1>
+              </div>
             </div>
+            {/* Instagram Download Button */}
+            <Button
+              onClick={handleDownloadInstagram}
+              disabled={isDownloading}
+              className="bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] hover:opacity-90 text-white"
+            >
+              {isDownloading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Instagram className="h-4 w-4 mr-2" />
+                  Download Instagram Carousel
+                </>
+              )}
+            </Button>
           </div>
         </div>
       </div>

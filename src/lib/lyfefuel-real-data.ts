@@ -2000,3 +2000,86 @@ export function getLyfefuelDemographics() {
 export function findLyfefuelStoryByVerificationId(verificationId: string): ParticipantStory | undefined {
   return LYFEFUEL_REAL_STORIES.find((story) => story.verificationId === verificationId);
 }
+
+/**
+ * Get top performers for Instagram sharing
+ * Criteria: Activity Minutes ≥10% OR Steps ≥20% AND NPS ≥7
+ * OR NPS ≥9 (high satisfaction even without big metric changes)
+ */
+export function getLyfefuelTopPerformers(): ParticipantStory[] {
+  return LYFEFUEL_REAL_STORIES.filter((story) => {
+    const activityChange = story.wearableMetrics?.activeMinutesChange?.changePercent || 0;
+    const stepsChange = story.wearableMetrics?.stepsChange?.changePercent || 0;
+    const nps = story.finalTestimonial?.npsScore || 0;
+
+    // Must have NPS >= 7
+    if (nps < 7) return false;
+
+    // Either: objective improvement (activity ≥10% OR steps ≥20%)
+    const hasObjectiveImprovement = activityChange >= 10 || stepsChange >= 20;
+
+    // Or: very high satisfaction (NPS ≥ 9)
+    const hasHighSatisfaction = nps >= 9;
+
+    return hasObjectiveImprovement || hasHighSatisfaction;
+  }).sort((a, b) => {
+    // Sort by a combination of metrics and NPS
+    const aScore = (a.wearableMetrics?.activeMinutesChange?.changePercent || 0) * 0.3 +
+                   (a.wearableMetrics?.stepsChange?.changePercent || 0) * 0.3 +
+                   (a.finalTestimonial?.npsScore || 0) * 4;
+    const bScore = (b.wearableMetrics?.activeMinutesChange?.changePercent || 0) * 0.3 +
+                   (b.wearableMetrics?.stepsChange?.changePercent || 0) * 0.3 +
+                   (b.finalTestimonial?.npsScore || 0) * 4;
+    return bScore - aScore;
+  });
+}
+
+/**
+ * Get the star participant for Instagram carousel
+ * Julie F. - NPS 10, +126% activity, +176% steps
+ */
+export function getLyfefuelStarParticipant(): ParticipantStory {
+  // Julie F. is the clear star with best combination of metrics + satisfaction + quote
+  const julie = LYFEFUEL_REAL_STORIES.find(s => s.name === "Julie F.");
+  if (julie) return julie;
+
+  // Fallback: return the top performer
+  return getLyfefuelTopPerformers()[0];
+}
+
+/**
+ * Get actual calculated averages for the study
+ */
+export function getLyfefuelActualAverages(): {
+  avgActivityChange: number;
+  avgStepsChange: number;
+  totalParticipants: number;
+  positiveActivityCount: number;
+  positiveStepsCount: number;
+} {
+  let totalActivity = 0;
+  let totalSteps = 0;
+  let positiveActivity = 0;
+  let positiveSteps = 0;
+
+  LYFEFUEL_REAL_STORIES.forEach((story) => {
+    const activity = story.wearableMetrics?.activeMinutesChange?.changePercent || 0;
+    const steps = story.wearableMetrics?.stepsChange?.changePercent || 0;
+
+    totalActivity += activity;
+    totalSteps += steps;
+
+    if (activity > 0) positiveActivity++;
+    if (steps > 0) positiveSteps++;
+  });
+
+  const count = LYFEFUEL_REAL_STORIES.length;
+
+  return {
+    avgActivityChange: Math.round(totalActivity / count),
+    avgStepsChange: Math.round(totalSteps / count),
+    totalParticipants: count,
+    positiveActivityCount: positiveActivity,
+    positiveStepsCount: positiveSteps,
+  };
+}
