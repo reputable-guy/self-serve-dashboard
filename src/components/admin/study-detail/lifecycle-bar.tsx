@@ -177,7 +177,6 @@ export function LifecycleBar({
         {STAGES.map((stage, index) => {
           const isPast = index < stageIndex;
           const isCurrent = index === stageIndex;
-          const isFuture = index > stageIndex;
 
           return (
             <div key={stage.id} className="flex items-center">

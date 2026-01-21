@@ -37,7 +37,7 @@ interface FulfillmentTabProps {
  */
 export function FulfillmentTab({
   studyId,
-  studyName,
+  studyName: _studyName,
   targetParticipants,
 }: FulfillmentTabProps) {
   const [showTrackingModal, setShowTrackingModal] = useState(false);

@@ -13,10 +13,10 @@ import React from "react";
 
 // Slide 1: The Hook - Question that creates curiosity
 export function InstagramSlide1Hook({
-  productName,
+  productName: _productName,
   studyDuration,
   totalParticipants,
-  productImageUrl,
+  productImageUrl: _productImageUrl,
 }: {
   productName: string;
   studyDuration: number;
@@ -268,7 +268,7 @@ export function InstagramSlide2Result({
 // Slide 3: Star Performer - Personal story with compelling stats
 export function InstagramSlide3Star({
   starParticipant,
-  productImageUrl,
+  productImageUrl: _productImageUrl,
 }: {
   starParticipant: ParticipantStory;
   productImageUrl: string;
@@ -370,7 +370,7 @@ export function InstagramSlide3Star({
               textShadow: "0 4px 20px rgba(0,0,0,0.5)",
             }}
           >
-            "{quote}"
+            &ldquo;{quote}&rdquo;
           </p>
 
           {/* Attribution */}
@@ -455,9 +455,9 @@ export function InstagramSlide3Star({
 
 // Slide 4: Transparency - CTA to see full results with methodology
 export function InstagramSlide4Proof({
-  totalParticipants,
-  brandName,
-  brandLogoUrl,
+  totalParticipants: _totalParticipants,
+  brandName: _brandName,
+  brandLogoUrl: _brandLogoUrl,
 }: {
   totalParticipants: number;
   brandName: string;
@@ -559,7 +559,7 @@ export function InstagramSlide4Proof({
               margin: "0 auto 40px",
             }}
           >
-            Every participant's data is published—
+            Every participant&apos;s data is published—
             <br />
             the improvements, the unchanged, and everything in between.
           </p>
@@ -613,7 +613,7 @@ export function InstagramSlide4Proof({
 }
 
 // Legacy exports for backwards compatibility
-export function InstagramStoryCardSimple(props: {
+export function InstagramStoryCardSimple(_props: {
   story: ParticipantStory;
   productName: string;
   brandName: string;
@@ -622,7 +622,7 @@ export function InstagramStoryCardSimple(props: {
   return <div>Deprecated - use carousel slides</div>;
 }
 
-export function InstagramCarouselPreview(props: {
+export function InstagramCarouselPreview(_props: {
   productName: string;
   brandName: string;
   studyDuration: number;
