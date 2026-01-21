@@ -18,7 +18,6 @@ import { persist } from "zustand/middleware";
 import type {
   AdminAlert,
   AlertType,
-  AlertSeverity,
   PlatformHealth,
 } from "@/lib/types";
 import {
@@ -145,7 +144,7 @@ export const useAlertsStore = create<AlertsStoreState>()(
 
       clearAcknowledgement: (alertId) => {
         set((state) => {
-          const { [alertId]: _, ...rest } = state.acknowledgedAlerts;
+          const { [alertId]: _removed, ...rest } = state.acknowledgedAlerts;
           return { acknowledgedAlerts: rest };
         });
       },

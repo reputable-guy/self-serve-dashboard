@@ -16,7 +16,6 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type {
   Cohort,
-  CohortStatus,
   ParticipantShipping,
   StudyRecruitmentState,
   RecruitmentStatus,

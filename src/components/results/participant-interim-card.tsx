@@ -307,7 +307,7 @@ function getRatingColor(rating: number): string {
  */
 function VillainProgressSection({
   ratings,
-  villainVariable,
+  villainVariable: _villainVariable,
 }: {
   ratings: VillainRating[];
   villainVariable: string;

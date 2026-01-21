@@ -84,7 +84,7 @@ export default function InstagramPreviewPage() {
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><span className="font-medium text-foreground">Color Palette:</span> Warm cream (#FDF8F3) and soft beige (#F5EDE6) backgrounds with teal (#00D1C1) as accent only</li>
             <li><span className="font-medium text-foreground">Typography:</span> Light weights, italics for emphasis, warm brown (#8B7355) for muted text</li>
-            <li><span className="font-medium text-foreground">Messaging:</span> Aspirational ("Feel the difference") not clinical</li>
+            <li><span className="font-medium text-foreground">Messaging:</span> Aspirational (&ldquo;Feel the difference&rdquo;) not clinical</li>
             <li><span className="font-medium text-foreground">Data:</span> +{actualAverages.avgActivityChange}% average activity increase, {actualAverages.totalParticipants} participants</li>
             <li><span className="font-medium text-foreground">Star:</span> Julie F. with +176% steps, +126% activity, NPS 10</li>
           </ul>

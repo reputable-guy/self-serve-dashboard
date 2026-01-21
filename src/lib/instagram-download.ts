@@ -170,14 +170,14 @@ export async function downloadInstagramCarousel(
 
 // Keep legacy export for backwards compatibility
 export async function downloadInstagramCards(
-  options: {
+  _options: {
     stories: ParticipantStory[];
     productName: string;
     brandName: string;
     studyDuration: number;
     studyTitle: string;
   },
-  cardElements: HTMLElement[]
+  _cardElements: HTMLElement[]
 ): Promise<void> {
   // Deprecated - use downloadInstagramCarousel instead
   console.warn("downloadInstagramCards is deprecated. Use downloadInstagramCarousel instead.");
