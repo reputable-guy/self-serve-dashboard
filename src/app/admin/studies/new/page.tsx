@@ -19,6 +19,8 @@ import {
   Watch,
   FileText,
   Heart,
+  Truck,
+  CreditCard,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -65,6 +67,10 @@ interface StudyFormData {
   category: string;
   rebateAmount: number;
 
+  // Shipping/Fulfillment
+  fulfillmentModel: "recruited" | "rebate";
+  shippingProductDescription: string;
+
   // Auto-configured
   autoConfig: StudyAutoConfig | null;
 
@@ -96,6 +102,8 @@ function AdminStudyCreationContent() {
     productName: "",
     category: "",
     rebateAmount: 50,
+    fulfillmentModel: "recruited", // Default: we ship to participants
+    shippingProductDescription: "",
     autoConfig: null,
     whatYoullDiscover: [],
     dailyRoutine: "",
@@ -339,6 +347,134 @@ function AdminStudyCreationContent() {
           Distributed over 28 days: ~{heartbeats.daily}/day + bonuses
         </p>
       </div>
+
+      {/* Product Fulfillment */}
+      <div className="space-y-3">
+        <Label className="flex items-center gap-2">
+          <Package className="h-4 w-4" />
+          Product Fulfillment
+        </Label>
+        <p className="text-sm text-muted-foreground">
+          How will participants receive your product?
+        </p>
+
+        <div className="space-y-3">
+          {/* Recruited Option */}
+          <Card
+            className={`cursor-pointer transition-colors ${
+              formData.fulfillmentModel === "recruited"
+                ? "border-primary bg-primary/5"
+                : "hover:border-muted-foreground/50"
+            }`}
+            onClick={() =>
+              setFormData((prev) => ({ ...prev, fulfillmentModel: "recruited" }))
+            }
+          >
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div
+                  className={`mt-0.5 h-4 w-4 rounded-full border-2 flex items-center justify-center ${
+                    formData.fulfillmentModel === "recruited"
+                      ? "border-primary"
+                      : "border-muted-foreground"
+                  }`}
+                >
+                  {formData.fulfillmentModel === "recruited" && (
+                    <div className="h-2 w-2 rounded-full bg-primary" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Truck className="h-4 w-4 text-primary" />
+                    <span className="font-medium">We ship to recruited participants</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Reputable recruits participants, you ship products to them
+                  </p>
+                  <p className="text-xs text-primary mt-1">
+                    → Cohort-based recruitment with fulfillment tracking
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Rebate Option */}
+          <Card
+            className={`cursor-pointer transition-colors ${
+              formData.fulfillmentModel === "rebate"
+                ? "border-primary bg-primary/5"
+                : "hover:border-muted-foreground/50"
+            }`}
+            onClick={() =>
+              setFormData((prev) => ({ ...prev, fulfillmentModel: "rebate" }))
+            }
+          >
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div
+                  className={`mt-0.5 h-4 w-4 rounded-full border-2 flex items-center justify-center ${
+                    formData.fulfillmentModel === "rebate"
+                      ? "border-primary"
+                      : "border-muted-foreground"
+                  }`}
+                >
+                  {formData.fulfillmentModel === "rebate" && (
+                    <div className="h-2 w-2 rounded-full bg-primary" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="h-4 w-4 text-primary" />
+                    <span className="font-medium">Participants purchase directly (rebate model)</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Participants buy from your site, you provide rebate
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    → No shipping coordination needed
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Shipping Product Description (only for recruited) */}
+        {formData.fulfillmentModel === "recruited" && (
+          <div className="space-y-2 pl-7">
+            <Label htmlFor="shippingDesc" className="text-sm">
+              What&apos;s being shipped?
+            </Label>
+            <Input
+              id="shippingDesc"
+              placeholder="e.g., 30-day supply of Sleep Support supplement (1 bottle)"
+              value={formData.shippingProductDescription}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  shippingProductDescription: e.target.value,
+                }))
+              }
+            />
+            <Card className="bg-blue-50 border-blue-200">
+              <CardContent className="p-3 text-xs text-blue-800">
+                <p className="font-medium mb-1">How cohort recruitment works:</p>
+                <ol className="list-decimal list-inside space-y-0.5">
+                  <li>Your study starts with a waitlist (participants join via app)</li>
+                  <li>When you click &quot;Go Live&quot;, a 24-hour enrollment window opens</li>
+                  <li>Everyone who enrolls becomes a cohort</li>
+                  <li>You ship to that cohort and enter tracking codes</li>
+                  <li>Once all tracking entered, you can open the next window</li>
+                </ol>
+                <p className="mt-2 text-blue-600">
+                  This ensures you get predictable batches, not a constant trickle.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </div>
     </div>
   );
 
@@ -568,6 +704,22 @@ function AdminStudyCreationContent() {
               {formData.allowNonWearable ? "Allowed" : "Not allowed"}
             </span>
           </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Fulfillment</span>
+            <span className="font-medium">
+              {formData.fulfillmentModel === "recruited"
+                ? "Ship to participants"
+                : "Rebate model"}
+            </span>
+          </div>
+          {formData.fulfillmentModel === "recruited" && formData.shippingProductDescription && (
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Shipping</span>
+              <span className="font-medium text-right max-w-[200px]">
+                {formData.shippingProductDescription}
+              </span>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -824,6 +976,12 @@ function AdminStudyCreationContent() {
                 whatYoullGet: whatYoullGet,
                 // Lock assessment version at study creation time
                 assessmentVersion: selectedCategory?.assessmentVersion || "1.0",
+                // Shipping configuration
+                fulfillmentModel: formData.fulfillmentModel,
+                shippingProductDescription:
+                  formData.fulfillmentModel === "recruited"
+                    ? formData.shippingProductDescription
+                    : undefined,
               });
 
               // Redirect to the new study

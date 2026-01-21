@@ -5,6 +5,7 @@
 export { OverviewTab } from "./overview-tab";
 export { ResultsTab } from "./results-tab";
 export { ConfigTab } from "./config-tab";
+export { FulfillmentTab } from "./fulfillment-tab";
 
 export * from "./types";
 export * from "./mock-data";

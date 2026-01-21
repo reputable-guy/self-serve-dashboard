@@ -12,6 +12,7 @@ import {
   BarChart3,
   Settings,
   Star,
+  Package,
 } from "lucide-react";
 import { useBrandsStore } from "@/lib/brands-store";
 import { useStudiesStore } from "@/lib/studies-store";
@@ -22,6 +23,7 @@ import {
   OverviewTab,
   ResultsTab,
   ConfigTab,
+  FulfillmentTab,
   MOCK_STUDIES,
   getStatusColor,
   getTierColor,
@@ -195,6 +197,11 @@ export default function AdminStudyDetailPage() {
     },
     { id: "results", label: "Results", icon: <Star className="h-4 w-4" /> },
     {
+      id: "fulfillment",
+      label: "Fulfillment",
+      icon: <Package className="h-4 w-4" />,
+    },
+    {
       id: "config",
       label: "Configuration",
       icon: <Settings className="h-4 w-4" />,
@@ -264,6 +271,13 @@ export default function AdminStudyDetailPage() {
         />
       )}
       {activeTab === "results" && <ResultsTab study={study} />}
+      {activeTab === "fulfillment" && (
+        <FulfillmentTab
+          studyId={study.id}
+          studyName={study.name}
+          targetParticipants={study.targetParticipants}
+        />
+      )}
       {activeTab === "config" && (
         <ConfigTab study={study} categoryConfig={categoryConfig} />
       )}

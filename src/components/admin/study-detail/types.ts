@@ -60,4 +60,4 @@ export interface Demographics {
   wearableDevices: DemographicItem[];
 }
 
-export type TabId = "overview" | "results" | "config";
+export type TabId = "overview" | "results" | "fulfillment" | "config";

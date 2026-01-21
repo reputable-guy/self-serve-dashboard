@@ -191,6 +191,9 @@ export interface Study {
   assessmentVersion: string;
   // Protocol details for verification page transparency
   protocol?: StudyProtocol;
+  // Shipping configuration
+  fulfillmentModel?: "recruited" | "rebate";
+  shippingProductDescription?: string;
   // Legacy fields
   productName?: string;
   durationDays?: number;
@@ -514,3 +517,9 @@ export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 /** Make specific properties required */
 export type RequiredBy<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
+
+// ============================================
+// SHIPPING & FULFILLMENT
+// ============================================
+
+export * from "./shipping";
