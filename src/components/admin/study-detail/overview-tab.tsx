@@ -443,9 +443,11 @@ export function OverviewTab({ study, brand, onOpenPreview }: OverviewTabProps) {
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">
-              {studyTargetParticipants}
+              {study.status === "completed" ? studyParticipants : (recruitmentState?.totalEnrolled ?? 0)}
             </p>
-            <p className="text-sm text-muted-foreground">participants</p>
+            <p className="text-sm text-muted-foreground">
+              of {studyTargetParticipants} target
+            </p>
           </CardContent>
         </Card>
 
