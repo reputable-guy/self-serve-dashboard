@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import {
   Card,
@@ -22,6 +23,9 @@ import {
   Eye,
   BarChart3,
   Sparkles,
+  Target,
+  UserPlus,
+  ArrowUpRight,
 } from "lucide-react";
 import type { StudyData } from "./types";
 import {
@@ -33,6 +37,7 @@ import {
   SORTED_SENSATE_STORIES,
   SORTED_LYFEFUEL_STORIES,
 } from "./mock-data";
+import { useCohortStore } from "@/lib/cohort-store";
 
 interface OverviewTabProps {
   study: StudyData;
@@ -45,6 +50,27 @@ export function OverviewTab({ study, brand, onOpenPreview }: OverviewTabProps) {
   const isSensateRealStudy = study.id === "study-sensate-real";
   const isLyfefuelRealStudy = study.id === "study-lyfefuel-real";
   const isRealDataStudy = isSensateRealStudy || isLyfefuelRealStudy;
+
+  // Get recruitment state from cohort store
+  const { initializeStudy, getRecruitmentState } = useCohortStore();
+
+  // Initialize study in cohort store on mount (if not already initialized)
+  useEffect(() => {
+    initializeStudy(study.id, study.targetParticipants);
+  }, [study.id, study.targetParticipants, initializeStudy]);
+
+  const recruitmentState = getRecruitmentState(study.id);
+
+  // Determine if study is in recruiting/waitlist phase
+  const isRecruitingPhase = study.status === "recruiting" || study.status === "filling-fast";
+  const isActivePhase = study.status === "active";
+  const isCompletedPhase = study.status === "completed";
+
+  // Get waitlist data for recruiting studies
+  const waitlistCount = recruitmentState?.waitlistCount ?? 0;
+  const totalEnrolled = recruitmentState?.totalEnrolled ?? 0;
+  const conversionRate = recruitmentState?.conversionRate ?? 0.35;
+  const expectedEnrollments = Math.round(waitlistCount * conversionRate);
 
   // Use real data for Sensate/LYFEfuel study, mock data for others
   const studyParticipants = isSensateRealStudy
@@ -91,86 +117,176 @@ export function OverviewTab({ study, brand, onOpenPreview }: OverviewTabProps) {
         </Button>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Enrolled
+      {/* Stats Grid - Different views based on study phase */}
+      {isRecruitingPhase ? (
+        /* Waitlist Stats for Recruiting Studies */
+        <Card className="border-[#00D1C1]/30 bg-gradient-to-r from-[#00D1C1]/5 to-white">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <UserPlus className="h-5 w-5 text-[#00D1C1]" />
+              Waitlist Status
             </CardTitle>
+            <CardDescription>
+              Track waitlist growth and projected enrollments for your upcoming study
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">
-              {studyTargetParticipants}
-            </p>
-            <p className="text-sm text-muted-foreground">participants</p>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {/* Waitlist Count */}
+              <div className="p-4 rounded-lg bg-white border">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                  <Users className="h-4 w-4" />
+                  On Waitlist
+                </div>
+                <p className="text-2xl font-bold">{waitlistCount}</p>
+                <p className="text-sm text-muted-foreground">
+                  {waitlistCount === 0 ? "No signups yet" : "people interested"}
+                </p>
+              </div>
+
+              {/* Projected Enrollments */}
+              <div className="p-4 rounded-lg bg-white border">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                  <TrendingUp className="h-4 w-4" />
+                  Projected
+                </div>
+                <p className="text-2xl font-bold text-[#00D1C1]">~{expectedEnrollments}</p>
+                <p className="text-sm text-muted-foreground">
+                  per window ({Math.round(conversionRate * 100)}% conversion)
+                </p>
+              </div>
+
+              {/* Target */}
+              <div className="p-4 rounded-lg bg-white border">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                  <Target className="h-4 w-4" />
+                  Target
+                </div>
+                <p className="text-2xl font-bold">{study.targetParticipants}</p>
+                <p className="text-sm text-muted-foreground">
+                  {totalEnrolled > 0 ? `${totalEnrolled} enrolled so far` : "participants needed"}
+                </p>
+              </div>
+
+              {/* Duration */}
+              <div className="p-4 rounded-lg bg-white border">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                  <Calendar className="h-4 w-4" />
+                  Duration
+                </div>
+                <p className="text-2xl font-bold">28 days</p>
+                <p className="text-sm text-muted-foreground">per participant</p>
+              </div>
+            </div>
+
+            {/* Waitlist Guidance */}
+            <div className="mt-4 p-3 rounded-lg bg-muted/50 text-sm">
+              {waitlistCount === 0 ? (
+                <p className="text-muted-foreground">
+                  Your study is live in the catalogue. As participants discover it, they&apos;ll join the waitlist.
+                  Visit the <strong>Fulfillment</strong> tab to open recruitment windows when ready.
+                </p>
+              ) : waitlistCount < 10 ? (
+                <p className="text-muted-foreground">
+                  Building momentum! With {waitlistCount} on the waitlist, you could expect ~{expectedEnrollments} enrollments
+                  per 24h window. Consider waiting for more signups for efficient cohorts.
+                </p>
+              ) : (
+                <p className="text-muted-foreground flex items-center gap-2">
+                  <ArrowUpRight className="h-4 w-4 text-green-500" />
+                  <span>
+                    <strong className="text-foreground">Ready to recruit!</strong> Your waitlist of {waitlistCount} could yield
+                    ~{expectedEnrollments} enrollments. Go to <strong>Fulfillment</strong> to open your first window.
+                  </span>
+                </p>
+              )}
+            </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4" />
-              Completed
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{studyParticipants}/{studyTargetParticipants}</p>
-            <p className="text-sm text-muted-foreground">{studyCompletionRate}% completion rate</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Avg. Improvement
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-green-600">
-              +{studyAvgImprovement}%
-            </p>
-            <p className="text-sm text-muted-foreground">{studyMetricName}</p>
-            {/* Show selection method for Tier 1 studies */}
-            {study.tier === 1 && !isRealDataStudy && (
-              <p className="text-xs text-muted-foreground/70 mt-0.5 italic">
-                {(study as StudyData & { primaryMetricConfig?: { mode: "auto" | "manual" } }).primaryMetricConfig?.mode === "manual"
-                  ? "(selected)"
-                  : "(auto)"}
+      ) : (
+        /* Standard Stats for Active/Completed Studies */
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Enrolled
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">
+                {isCompletedPhase ? studyParticipants : totalEnrolled}
               </p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Duration
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{isLyfefuelRealStudy ? "24" : "28"} days</p>
-            {isRealDataStudy ? (
-              <p className="text-sm text-muted-foreground">Rolling enrollment</p>
-            ) : (
               <p className="text-sm text-muted-foreground">
-                {new Date(study.startDate).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                })}{" "}
-                -{" "}
-                {new Date(study.endDate).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                })}
+                of {studyTargetParticipants} target
               </p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4" />
+                Completed
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">{studyParticipants}/{studyTargetParticipants}</p>
+              <p className="text-sm text-muted-foreground">{studyCompletionRate}% completion rate</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Avg. Improvement
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold text-green-600">
+                +{studyAvgImprovement}%
+              </p>
+              <p className="text-sm text-muted-foreground">{studyMetricName}</p>
+              {/* Show selection method for Tier 1 studies */}
+              {study.tier === 1 && !isRealDataStudy && (
+                <p className="text-xs text-muted-foreground/70 mt-0.5 italic">
+                  {(study as StudyData & { primaryMetricConfig?: { mode: "auto" | "manual" } }).primaryMetricConfig?.mode === "manual"
+                    ? "(selected)"
+                    : "(auto)"}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                Duration
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">{isLyfefuelRealStudy ? "24" : "28"} days</p>
+              {isRealDataStudy ? (
+                <p className="text-sm text-muted-foreground">Rolling enrollment</p>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  {new Date(study.startDate).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })}{" "}
+                  -{" "}
+                  {new Date(study.endDate).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Brand + Timeline Row */}
       <div className="grid gap-6 lg:grid-cols-2">
