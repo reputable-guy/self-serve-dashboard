@@ -266,7 +266,7 @@ export function OverviewTab({ study, brand, onOpenPreview }: OverviewTabProps) {
                   </div>
                   <div>
                     <p className="font-medium text-purple-900">Your study is live in the catalogue</p>
-                    <p className="text-sm text-purple-700">Participants can join the waitlist. Start recruiting when you're ready.</p>
+                    <p className="text-sm text-purple-700">Participants can join the waitlist. Start recruiting when you&apos;re ready.</p>
                   </div>
                 </div>
                 <Link href={`/admin/studies/${study.id}?tab=fulfillment`}>
