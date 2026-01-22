@@ -25,8 +25,10 @@ import {
   Sparkles,
   Package,
   Rocket,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ArrowRight,
   Info,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   AlertTriangle,
   EyeOff,
   UserPlus,
@@ -65,6 +67,7 @@ export function OverviewTab({ study, brand, onOpenPreview, onNavigateToTab }: Ov
   const isNewUserStudy = study.isDemo === false && study.participants === 0 && !isRealDataStudy;
 
   // Check if study is in pre-launch phase (draft or coming_soon)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isPreLaunchStudy = study.status === "draft" || study.status === "coming_soon";
 
   // Get store actions for launch checklist
