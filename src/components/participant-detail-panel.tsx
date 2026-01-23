@@ -1,12 +1,21 @@
 "use client";
 
+/**
+ * ParticipantDetailPanel - Sliding panel showing detailed participant information
+ *
+ * Sub-components have been extracted to src/components/participant/ for reusability:
+ * - SparklineChart: Simple line chart for trends
+ * - MetricCard: Metric display with sparkline
+ * - CheckInTimeline: Check-in history display
+ * - SyncCalendar: Device sync history calendar
+ */
+
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   MockParticipant,
-  ParticipantDetail,
   generateParticipantDetailForStudy,
 } from "@/lib/mock-data";
 import { Study } from "@/lib/studies-store";
@@ -15,293 +24,20 @@ import {
   Watch,
   MapPin,
   TrendingUp,
-  TrendingDown,
   Moon,
   Heart,
   Activity,
   Zap,
-  CheckCircle2,
-  XCircle,
-  MessageSquare,
-  ChevronRight,
   AlertTriangle,
 } from "lucide-react";
+
+// Import extracted sub-components
+import { MetricCard, CheckInTimeline, SyncCalendar } from "./participant";
 
 interface ParticipantDetailPanelProps {
   participant: MockParticipant;
   study: Study;
   onClose: () => void;
-}
-
-// Simple sparkline chart component
-function SparklineChart({
-  data,
-  color = "#00D1C1",
-  height = 40,
-  showBaseline,
-  baselineValue,
-}: {
-  data: number[];
-  color?: string;
-  height?: number;
-  showBaseline?: boolean;
-  baselineValue?: number;
-}) {
-  if (data.length === 0) return null;
-
-  const min = Math.min(...data);
-  const max = Math.max(...data);
-  const range = max - min || 1;
-  const width = 100; // Use viewBox for responsive scaling
-  const padding = 6; // Increase padding to keep dots inside
-
-  const points = data.map((value, index) => {
-    const x = padding + (index / (data.length - 1)) * (width - padding * 2);
-    const y = height - padding - ((value - min) / range) * (height - padding * 2);
-    return `${x},${y}`;
-  }).join(" ");
-
-  // Calculate baseline Y position
-  const baselineY = baselineValue
-    ? height - padding - ((baselineValue - min) / range) * (height - padding * 2)
-    : null;
-
-  return (
-    <svg
-      viewBox={`0 0 ${width} ${height}`}
-      className="w-full h-10"
-      preserveAspectRatio="none"
-    >
-      {/* Baseline reference line */}
-      {showBaseline && baselineY !== null && (
-        <line
-          x1={padding}
-          y1={baselineY}
-          x2={width - padding}
-          y2={baselineY}
-          stroke="#9CA3AF"
-          strokeWidth="1"
-          strokeDasharray="4,4"
-        />
-      )}
-      {/* Data line */}
-      <polyline
-        points={points}
-        fill="none"
-        stroke={color}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        vectorEffect="non-scaling-stroke"
-      />
-      {/* End point dot */}
-      {data.length > 0 && (
-        <circle
-          cx={width - padding}
-          cy={height - padding - ((data[data.length - 1] - min) / range) * (height - padding * 2)}
-          r="3"
-          fill={color}
-        />
-      )}
-    </svg>
-  );
-}
-
-// Metric card with sparkline
-function MetricCard({
-  label,
-  currentValue,
-  baselineValue,
-  unit,
-  data,
-  color,
-  icon: Icon,
-  invertTrend = false,
-}: {
-  label: string;
-  currentValue: number;
-  baselineValue: number;
-  unit: string;
-  data: number[];
-  color: string;
-  icon: React.ElementType;
-  invertTrend?: boolean;
-}) {
-  const change = ((currentValue - baselineValue) / baselineValue) * 100;
-  const isPositive = invertTrend ? change < 0 : change > 0;
-  const TrendIcon = isPositive ? TrendingUp : TrendingDown;
-
-  return (
-    <Card>
-      <CardContent className="pt-4">
-        <div className="flex items-start justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-md" style={{ backgroundColor: `${color}20` }}>
-              <Icon className="h-4 w-4" style={{ color }} />
-            </div>
-            <span className="text-sm text-muted-foreground">{label}</span>
-          </div>
-          <div className={`flex items-center gap-1 text-xs font-medium ${isPositive ? "text-green-500" : "text-red-500"}`}>
-            <TrendIcon className="h-3 w-3" />
-            {Math.abs(change).toFixed(0)}%
-          </div>
-        </div>
-        <div className="flex items-baseline gap-2 mb-3">
-          <span className="text-2xl font-bold">{currentValue}</span>
-          <span className="text-sm text-muted-foreground">{unit}</span>
-          <span className="text-xs text-muted-foreground">
-            (baseline: {baselineValue}{unit})
-          </span>
-        </div>
-        <SparklineChart
-          data={data}
-          color={color}
-          showBaseline
-          baselineValue={baselineValue}
-        />
-      </CardContent>
-    </Card>
-  );
-}
-
-// Check-in timeline component
-function CheckInTimeline({
-  checkIns,
-}: {
-  checkIns: ParticipantDetail["checkIns"];
-}) {
-  // Show last 10 check-ins
-  const recentCheckIns = checkIns.slice(-10).reverse();
-
-  return (
-    <div className="space-y-3">
-      {recentCheckIns.map((checkIn) => (
-        <div
-          key={checkIn.day}
-          className={`p-3 rounded-lg border ${
-            checkIn.completed
-              ? "bg-green-500/5 border-green-500/20"
-              : "bg-red-500/5 border-red-500/20"
-          }`}
-        >
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              {checkIn.completed ? (
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
-              ) : (
-                <XCircle className="h-4 w-4 text-red-500" />
-              )}
-              <span className="font-medium text-sm">Day {checkIn.day}</span>
-              <span className="text-xs text-muted-foreground">{checkIn.date}</span>
-            </div>
-            {checkIn.completed && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600">
-                Completed
-              </span>
-            )}
-            {!checkIn.completed && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-600">
-                Missed
-              </span>
-            )}
-          </div>
-
-          {checkIn.completed && (
-            <div className="space-y-2 mt-3">
-              {/* Villain Response */}
-              {checkIn.villainResponse && (
-                <div className="p-2 rounded bg-purple-500/10 border border-purple-500/20">
-                  <div className="flex items-start gap-2">
-                    <MessageSquare className="h-3.5 w-3.5 text-purple-500 mt-0.5" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">{checkIn.villainResponse.question}</p>
-                      <p className="text-sm font-medium text-purple-600">{checkIn.villainResponse.answer}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Custom Responses */}
-              {checkIn.customResponses && checkIn.customResponses.length > 0 && (
-                <div className="space-y-2">
-                  {checkIn.customResponses.map((response, idx) => (
-                    <div key={idx} className="text-sm">
-                      {response.questionType === "likert_scale" ? (
-                        <div className="p-2 rounded bg-blue-500/10 border border-blue-500/20">
-                          <p className="text-xs text-muted-foreground mb-2">{response.question}</p>
-                          <div className="space-y-1">
-                            <div className="flex justify-between text-xs text-muted-foreground">
-                              <span>{response.likertMinLabel}</span>
-                              <span>{response.likertMaxLabel}</span>
-                            </div>
-                            <div className="flex gap-0.5">
-                              {Array.from(
-                                { length: (response.likertMax || 10) - (response.likertMin || 1) + 1 },
-                                (_, i) => (response.likertMin || 1) + i
-                              ).map((num) => (
-                                <div
-                                  key={num}
-                                  className={`flex-1 h-6 rounded text-xs flex items-center justify-center font-medium ${
-                                    num === response.likertValue
-                                      ? "bg-blue-500 text-white"
-                                      : num < (response.likertValue || 0)
-                                      ? "bg-blue-500/30 text-blue-600"
-                                      : "bg-muted text-muted-foreground"
-                                  }`}
-                                >
-                                  {num}
-                                </div>
-                              ))}
-                            </div>
-                            <p className="text-center text-sm font-semibold text-blue-600">
-                              {response.likertValue} / {response.likertMax || 10}
-                            </p>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex items-start gap-2">
-                          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground mt-0.5" />
-                          <div className="flex-1">
-                            <span className="text-muted-foreground">{response.question}</span>
-                            <span className="font-medium ml-2">{response.answer}</span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// Sync history calendar
-function SyncCalendar({
-  syncHistory,
-}: {
-  syncHistory: ParticipantDetail["syncHistory"];
-}) {
-  return (
-    <div className="flex flex-wrap gap-1">
-      {syncHistory.map((day, idx) => (
-        <div
-          key={idx}
-          className={`w-6 h-6 rounded text-xs flex items-center justify-center font-medium ${
-            day.synced
-              ? "bg-green-500/20 text-green-600"
-              : "bg-red-500/20 text-red-600"
-          }`}
-          title={`${day.date}: ${day.synced ? "Synced" : "Not synced"}`}
-        >
-          {idx + 1}
-        </div>
-      ))}
-    </div>
-  );
 }
 
 export function ParticipantDetailPanel({ participant, study, onClose }: ParticipantDetailPanelProps) {

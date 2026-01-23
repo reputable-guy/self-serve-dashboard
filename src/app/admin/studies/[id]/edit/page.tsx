@@ -355,7 +355,6 @@ function StudyEditContent() {
     updateStudy(studyId, {
       name: formData.productName,
       brandId: formData.brandId,
-      brandName: selectedBrand?.name || study?.brandName || "Unknown Brand",
       productDescription: formData.productDescription,
       productImage: formData.productImage,
       category: formData.category,

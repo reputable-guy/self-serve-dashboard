@@ -176,7 +176,7 @@ export interface Study {
   isDemo?: boolean;
   name: string;
   brandId: string;
-  brandName: string; // TODO: Consider removing - should lookup from brands store
+  // NOTE: brandName removed - lookup from brands store at render time using getBrandById(study.brandId)?.name
   category: string;
   categoryKey: string;
   categoryLabel: string;
