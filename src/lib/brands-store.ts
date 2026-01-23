@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { MOCK_BRANDS, Brand } from './roles';
+import { validateBrandData, warnValidationErrors } from './store-validation';
+import { mergeSeedData, createSafeRehydrationHandler, safeParseDateField } from './store-utils';
 
 interface BrandsStore {
   brands: Brand[];
@@ -34,6 +36,12 @@ export const useBrandsStore = create<BrandsStore>()(
       setHasHydrated: (state: boolean) => set({ _hasHydrated: state }),
 
       addBrand: (brandData) => {
+        // Validate brand data
+        const validation = validateBrandData(brandData);
+        if (!validation.valid) {
+          warnValidationErrors('addBrand', validation.errors);
+        }
+
         const newBrand: Brand = {
           id: generateId(),
           name: brandData.name,
@@ -54,6 +62,21 @@ export const useBrandsStore = create<BrandsStore>()(
       },
 
       updateBrand: (id, updates) => {
+        // Validate that brand exists
+        const existingBrand = get().brands.find(b => b.id === id);
+        if (!existingBrand) {
+          warnValidationErrors('updateBrand', [`Brand with id '${id}' not found`]);
+          return;
+        }
+
+        // Validate update data if it contains key fields
+        if (updates.name || updates.contactEmail || updates.contactName) {
+          const validation = validateBrandData(updates);
+          if (!validation.valid) {
+            warnValidationErrors('updateBrand', validation.errors);
+          }
+        }
+
         set((state) => ({
           brands: state.brands.map((brand) =>
             brand.id === id ? { ...brand, ...updates } : brand
@@ -82,25 +105,19 @@ export const useBrandsStore = create<BrandsStore>()(
             : brand.createdAt,
         })),
       }),
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          // Convert date strings back to Date objects
-          state.brands = state.brands.map((brand) => ({
-            ...brand,
-            createdAt: new Date(brand.createdAt),
-          }));
+      onRehydrateStorage: () => createSafeRehydrationHandler('brands', (state) => {
+        // Convert date strings back to Date objects (with safe parsing)
+        state.brands = state.brands.map((brand) => ({
+          ...brand,
+          createdAt: safeParseDateField(brand.createdAt),
+        }));
 
-          // Merge in any new brands from MOCK_BRANDS that don't exist in persisted state
-          const existingIds = new Set(state.brands.map(b => b.id));
-          const newBrands = MOCK_BRANDS.filter(b => !existingIds.has(b.id));
-          if (newBrands.length > 0) {
-            state.brands = [...newBrands, ...state.brands];
-          }
+        // Merge in any new brands from MOCK_BRANDS that don't exist in persisted state
+        state.brands = mergeSeedData(state.brands, MOCK_BRANDS, b => b.id);
 
-          // Mark hydration as complete
-          state.setHasHydrated(true);
-        }
-      },
+        // Mark hydration as complete
+        state.setHasHydrated(true);
+      }),
     }
   )
 );

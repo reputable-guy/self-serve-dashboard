@@ -451,7 +451,6 @@ function AdminStudyCreationContent() {
     const study = addStudy({
       name: formData.productName,
       brandId: formData.brandId,
-      brandName: selectedBrand?.name || "Unknown Brand",
       category: formData.category,
       categoryKey: formData.category,
       categoryLabel: categoryLabel,

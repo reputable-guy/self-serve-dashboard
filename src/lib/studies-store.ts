@@ -16,6 +16,12 @@ import type { Study, LaunchChecklist } from './types';
 // Import seed data from separate data file
 import { SEED_STUDIES } from './data/seed-studies';
 
+// Import validation utilities
+import { validateStudyData, warnValidationErrors } from './store-validation';
+
+// Import shared store utilities
+import { mergeSeedData, createSafeRehydrationHandler } from './store-utils';
+
 // Re-export Study type for backwards compatibility
 export type { Study } from './types';
 
@@ -56,6 +62,12 @@ export const useStudiesStore = create<StudiesStore>()(
       setHasHydrated: (state: boolean) => set({ _hasHydrated: state }),
 
       addStudy: (studyData) => {
+        // Validate study data
+        const validation = validateStudyData(studyData);
+        if (!validation.valid) {
+          warnValidationErrors('addStudy', validation.errors);
+        }
+
         const now = new Date().toISOString();
         const newStudy: Study = {
           ...studyData,
@@ -74,6 +86,22 @@ export const useStudiesStore = create<StudiesStore>()(
       },
 
       updateStudy: (id, updates) => {
+        // Validate that study exists
+        const existingStudy = get().studies.find(s => s.id === id);
+        if (!existingStudy) {
+          warnValidationErrors('updateStudy', [`Study with id '${id}' not found`]);
+          return;
+        }
+
+        // Validate update data if it contains key fields
+        if (updates.name || updates.brandId || updates.category ||
+            updates.targetParticipants !== undefined || updates.rebateAmount !== undefined) {
+          const validation = validateStudyData(updates);
+          if (!validation.valid) {
+            warnValidationErrors('updateStudy', validation.errors);
+          }
+        }
+
         set((state) => ({
           studies: state.studies.map((study) =>
             study.id === id
@@ -217,18 +245,12 @@ export const useStudiesStore = create<StudiesStore>()(
       partialize: (state) => ({
         studies: state.studies,
       }),
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          // Merge in any new studies from SEED_STUDIES that don't exist in persisted state
-          const existingIds = new Set(state.studies.map(s => s.id));
-          const newStudies = SEED_STUDIES.filter(s => !existingIds.has(s.id));
-          if (newStudies.length > 0) {
-            state.studies = [...newStudies, ...state.studies];
-          }
-          // Mark hydration as complete
-          state.setHasHydrated(true);
-        }
-      },
+      onRehydrateStorage: () => createSafeRehydrationHandler('studies', (state) => {
+        // Merge in any new studies from SEED_STUDIES that don't exist in persisted state
+        state.studies = mergeSeedData(state.studies, SEED_STUDIES, s => s.id);
+        // Mark hydration as complete
+        state.setHasHydrated(true);
+      }),
     }
   )
 );

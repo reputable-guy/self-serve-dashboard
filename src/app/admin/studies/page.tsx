@@ -53,13 +53,18 @@ export default function AdminStudiesPage() {
 
   // Get data from stores
   const brands = useBrandsStore((state) => state.brands);
+  const getBrandById = useBrandsStore((state) => state.getBrandById);
   const studies = useStudiesStore((state) => state.studies);
   const resetStudies = useStudiesStore((state) => state.resetToSeedData);
 
+  // Helper to get brand name from brandId
+  const getBrandName = (brandId: string) => getBrandById(brandId)?.name || "Unknown Brand";
+
   const filteredStudies = studies.filter((study) => {
+    const brandName = getBrandName(study.brandId);
     const matchesSearch =
       study.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      study.brandName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      brandName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       study.categoryLabel.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesStatus =
@@ -234,7 +239,7 @@ export default function AdminStudiesPage() {
                         href={`/admin/brands/${study.brandId}`}
                         className="hover:text-primary hover:underline"
                       >
-                        {study.brandName}
+                        {getBrandName(study.brandId)}
                       </Link>
                     </td>
                     <td className="p-4 text-sm">{study.categoryLabel}</td>

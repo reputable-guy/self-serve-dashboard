@@ -19,7 +19,6 @@ export const SEED_STUDIES: Study[] = [
     isDemo: false, // Real imported data - NOT demo
     name: "Sensate Sleep & Stress Study (Real Data)",
     brandId: "brand-sensate",
-    brandName: "Sensate",
     category: "stress",
     categoryKey: "stress",
     categoryLabel: "Stress & Sleep",
@@ -66,7 +65,6 @@ export const SEED_STUDIES: Study[] = [
     isDemo: false, // Real imported data - NOT demo
     name: "LYFEfuel Daily Essentials Energy Study (Real Data)",
     brandId: "brand-lyfefuel",
-    brandName: "LYFEfuel",
     category: "energy",
     categoryKey: "energy",
     categoryLabel: "Energy & Vitality",
@@ -113,7 +111,6 @@ export const SEED_STUDIES: Study[] = [
     isDemo: true, // Demo study with sample data
     name: "Sensate Stress Relief Study",
     brandId: "brand-sensate",
-    brandName: "Sensate",
     category: "stress",
     categoryKey: "stress",
     categoryLabel: "Stress Management",
@@ -146,7 +143,6 @@ export const SEED_STUDIES: Study[] = [
     isDemo: true, // Demo study with sample data
     name: "Sensate Sleep Quality Study",
     brandId: "brand-sensate",
-    brandName: "Sensate",
     category: "sleep",
     categoryKey: "sleep",
     categoryLabel: "Sleep",
@@ -179,7 +175,6 @@ export const SEED_STUDIES: Study[] = [
     isDemo: true, // Demo study with sample data
     name: "Sensate Anxiety & Focus Study",
     brandId: "brand-sensate",
-    brandName: "Sensate",
     category: "anxiety",
     categoryKey: "anxiety",
     categoryLabel: "Anxiety Relief",
@@ -213,7 +208,6 @@ export const SEED_STUDIES: Study[] = [
     isDemo: true, // Demo study with sample data
     name: "Daily Essentials Energy Study",
     brandId: "brand-lyfefuel",
-    brandName: "LYFEfuel",
     category: "energy",
     categoryKey: "energy",
     categoryLabel: "Energy & Vitality",
@@ -246,7 +240,6 @@ export const SEED_STUDIES: Study[] = [
     isDemo: true, // Demo study with sample data
     name: "Daily Essentials Satiety Study",
     brandId: "brand-lyfefuel",
-    brandName: "LYFEfuel",
     category: "weight",
     categoryKey: "weight",
     categoryLabel: "Weight & Metabolism",
@@ -279,7 +272,6 @@ export const SEED_STUDIES: Study[] = [
     isDemo: true, // Demo study with sample data
     name: "Daily Essentials Digestive Comfort Study",
     brandId: "brand-lyfefuel",
-    brandName: "LYFEfuel",
     category: "gut",
     categoryKey: "gut",
     categoryLabel: "Gut Health",
@@ -312,7 +304,6 @@ export const SEED_STUDIES: Study[] = [
     isDemo: true, // Demo study with sample data
     name: "SleepWell Premium",
     brandId: "brand-acme",
-    brandName: "Acme Supplements",
     category: "sleep",
     categoryKey: "sleep",
     categoryLabel: "Sleep",
@@ -345,7 +336,6 @@ export const SEED_STUDIES: Study[] = [
     isDemo: true, // Demo study with sample data
     name: "Recovery Plus",
     brandId: "brand-acme",
-    brandName: "Acme Supplements",
     category: "recovery",
     categoryKey: "recovery",
     categoryLabel: "Recovery",
@@ -378,7 +368,6 @@ export const SEED_STUDIES: Study[] = [
     isDemo: true, // Demo study with sample data
     name: "Calm Focus Formula",
     brandId: "brand-zenwell",
-    brandName: "ZenWell",
     category: "stress",
     categoryKey: "stress",
     categoryLabel: "Stress Management",
@@ -411,7 +400,6 @@ export const SEED_STUDIES: Study[] = [
     isDemo: true, // Demo study with sample data
     name: "Energy Boost Complex",
     brandId: "brand-vitality",
-    brandName: "Vitality Labs",
     category: "energy",
     categoryKey: "energy",
     categoryLabel: "Energy & Vitality",
@@ -444,7 +432,6 @@ export const SEED_STUDIES: Study[] = [
     isDemo: true, // Demo study with sample data
     name: "Gut Health Pro",
     brandId: "brand-acme",
-    brandName: "Acme Supplements",
     category: "gut",
     categoryKey: "gut",
     categoryLabel: "Gut Health",
@@ -477,7 +464,6 @@ export const SEED_STUDIES: Study[] = [
     isDemo: true, // Demo study with sample data
     name: "Focus Flow",
     brandId: "brand-zenwell",
-    brandName: "ZenWell",
     category: "focus",
     categoryKey: "focus",
     categoryLabel: "Focus & Concentration",
