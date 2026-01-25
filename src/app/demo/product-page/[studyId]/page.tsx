@@ -19,6 +19,7 @@ import {
   getWidgetDataForStudy,
   getBestWidgetMode,
   hasWidgetData,
+  getDefaultFeaturedParticipantIds,
 } from "@/lib/widget-data";
 
 // Product info mapped by study ID with hex brand colors
@@ -96,6 +97,7 @@ interface WidgetConfig {
   brandColor: string;
   position: "bottom-left" | "bottom-right";
   mode: string | null;
+  featuredParticipantIds?: string[];
 }
 
 export default function DynamicProductPage() {
@@ -109,6 +111,7 @@ export default function DynamicProductPage() {
   // Custom widget config from localStorage
   const [customBrandColor, setCustomBrandColor] = useState<string | null>(null);
   const [customPosition, setCustomPosition] = useState<"bottom-left" | "bottom-right">("bottom-left");
+  const [featuredParticipantIds, setFeaturedParticipantIds] = useState<string[]>([]);
 
   // Load custom config from localStorage on mount
   useEffect(() => {
@@ -118,9 +121,18 @@ export default function DynamicProductPage() {
         const config: WidgetConfig = JSON.parse(saved);
         if (config.brandColor) setCustomBrandColor(config.brandColor);
         if (config.position) setCustomPosition(config.position);
+        if (config.featuredParticipantIds && config.featuredParticipantIds.length > 0) {
+          setFeaturedParticipantIds(config.featuredParticipantIds);
+        } else {
+          setFeaturedParticipantIds(getDefaultFeaturedParticipantIds(studyId));
+        }
       } catch {
-        // Invalid JSON, ignore
+        // Invalid JSON, use defaults
+        setFeaturedParticipantIds(getDefaultFeaturedParticipantIds(studyId));
       }
+    } else {
+      // No saved config, use defaults
+      setFeaturedParticipantIds(getDefaultFeaturedParticipantIds(studyId));
     }
   }, [studyId]);
 
@@ -413,7 +425,11 @@ export default function DynamicProductPage() {
           wearableType: widgetData.wearableType,
           compensationNote: widgetData.compensationNote,
         }}
-        participants={widgetData.participants}
+        participants={
+          featuredParticipantIds.length > 0
+            ? widgetData.participants.filter(p => featuredParticipantIds.includes(p.id))
+            : widgetData.participants.slice(0, 3)
+        }
         verifyPageUrl={widgetData.verifyPageUrl}
         brandColor={customBrandColor || productInfo.brandColorHex}
       />
