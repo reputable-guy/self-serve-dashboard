@@ -380,6 +380,7 @@ export function WidgetSection({ studyId }: WidgetSectionProps) {
         }}
         participants={widgetData.participants}
         verifyPageUrl={widgetData.verifyPageUrl}
+        brandColor={brandColor}
       />
     </>
   );
