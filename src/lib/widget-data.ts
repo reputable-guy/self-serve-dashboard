@@ -342,7 +342,8 @@ export function getAllWidgetModes(studyId: string): WidgetModeConfig[] {
  */
 export function getWidgetDataForStudy(studyId: string): WidgetStudyData | null {
   if (studyId === "study-sensate-real") {
-    const participants = SENSATE_REAL_STORIES.slice(0, 6).map((story) =>
+    // Return ALL participants so brands can choose which to feature
+    const participants = SENSATE_REAL_STORIES.map((story) =>
       transformParticipantToPreview(story, "sensate")
     );
 
@@ -361,7 +362,8 @@ export function getWidgetDataForStudy(studyId: string): WidgetStudyData | null {
   }
 
   if (studyId === "study-lyfefuel-real") {
-    const participants = LYFEFUEL_REAL_STORIES.slice(0, 6).map((story) =>
+    // Return ALL participants so brands can choose which to feature
+    const participants = LYFEFUEL_REAL_STORIES.map((story) =>
       transformParticipantToPreview(story, "lyfefuel")
     );
 
@@ -388,4 +390,34 @@ export function getWidgetDataForStudy(studyId: string): WidgetStudyData | null {
  */
 export function hasWidgetData(studyId: string): boolean {
   return studyId === "study-sensate-real" || studyId === "study-lyfefuel-real";
+}
+
+/**
+ * Get the default top 3 participant IDs based on rating and positive metrics.
+ * Used for auto-selection when no manual selection has been made.
+ */
+export function getDefaultFeaturedParticipantIds(studyId: string): string[] {
+  const widgetData = getWidgetDataForStudy(studyId);
+  if (!widgetData) return [];
+
+  // Score each participant by rating + positive metric change
+  const scored = widgetData.participants.map((p) => {
+    let score = p.rating * 10; // Rating contributes significantly
+
+    // Parse metric value to get numeric change
+    const metricMatch = p.primaryMetric.value.match(/([+-]?\d+)/);
+    if (metricMatch) {
+      const change = parseInt(metricMatch[1], 10);
+      // Positive changes add to score
+      if (change > 0) {
+        score += change;
+      }
+    }
+
+    return { id: p.id, score };
+  });
+
+  // Sort by score descending and take top 3
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, 3).map((s) => s.id);
 }

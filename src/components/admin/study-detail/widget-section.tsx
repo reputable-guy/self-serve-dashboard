@@ -16,12 +16,16 @@ import {
   Check,
   Sparkles,
   Palette,
+  Users,
+  Star,
+  RotateCcw,
 } from "lucide-react";
 import {
   getBestWidgetMode,
   getAllWidgetModes,
   getWidgetDataForStudy,
   hasWidgetData,
+  getDefaultFeaturedParticipantIds,
   type WidgetModeConfig,
   type WidgetDisplayMode,
 } from "@/lib/widget-data";
@@ -50,6 +54,7 @@ export interface WidgetConfig {
   brandColor: string;
   position: "bottom-left" | "bottom-right";
   mode: WidgetDisplayMode | null;
+  featuredParticipantIds: string[];
 }
 
 export function WidgetSection({ studyId }: WidgetSectionProps) {
@@ -59,6 +64,7 @@ export function WidgetSection({ studyId }: WidgetSectionProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [brandColor, setBrandColor] = useState("#00D1C1");
   const [position, setPosition] = useState<"bottom-left" | "bottom-right">("bottom-left");
+  const [featuredParticipantIds, setFeaturedParticipantIds] = useState<string[]>([]);
 
   // Load saved config from localStorage on mount
   useEffect(() => {
@@ -69,17 +75,27 @@ export function WidgetSection({ studyId }: WidgetSectionProps) {
         if (config.brandColor) setBrandColor(config.brandColor);
         if (config.position) setPosition(config.position);
         if (config.mode) setSelectedMode(config.mode);
+        if (config.featuredParticipantIds && config.featuredParticipantIds.length > 0) {
+          setFeaturedParticipantIds(config.featuredParticipantIds);
+        } else {
+          // Use default auto-selected participants
+          setFeaturedParticipantIds(getDefaultFeaturedParticipantIds(studyId));
+        }
       } catch {
-        // Invalid JSON, ignore
+        // Invalid JSON, use defaults
+        setFeaturedParticipantIds(getDefaultFeaturedParticipantIds(studyId));
       }
+    } else {
+      // No saved config, use defaults
+      setFeaturedParticipantIds(getDefaultFeaturedParticipantIds(studyId));
     }
   }, [studyId]);
 
   // Save config to localStorage whenever it changes
   useEffect(() => {
-    const config: WidgetConfig = { brandColor, position, mode: selectedMode };
+    const config: WidgetConfig = { brandColor, position, mode: selectedMode, featuredParticipantIds };
     localStorage.setItem(getWidgetConfigKey(studyId), JSON.stringify(config));
-  }, [brandColor, position, selectedMode, studyId]);
+  }, [brandColor, position, selectedMode, featuredParticipantIds, studyId]);
 
   // Check if widget data is available
   if (!hasWidgetData(studyId)) {
@@ -335,6 +351,110 @@ export function WidgetSection({ studyId }: WidgetSectionProps) {
                 </div>
               </div>
 
+              {/* Featured Participants */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <p className="text-sm font-medium">Featured Participants</p>
+                    <span className="text-xs text-muted-foreground">
+                      ({featuredParticipantIds.length}/3 selected)
+                    </span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setFeaturedParticipantIds(getDefaultFeaturedParticipantIds(studyId))}
+                    className="h-7 text-xs text-muted-foreground"
+                  >
+                    <RotateCcw className="h-3 w-3 mr-1" />
+                    Auto-select
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Choose up to 3 participants to highlight in the modal. Auto-select picks the top performers.
+                </p>
+                <div className="space-y-2 max-h-64 overflow-y-auto border rounded-lg p-2">
+                  {widgetData.participants.map((participant) => {
+                    const isSelected = featuredParticipantIds.includes(participant.id);
+                    const isDefault = getDefaultFeaturedParticipantIds(studyId).includes(participant.id);
+                    const canSelect = isSelected || featuredParticipantIds.length < 3;
+
+                    return (
+                      <button
+                        key={participant.id}
+                        onClick={() => {
+                          if (isSelected) {
+                            setFeaturedParticipantIds(featuredParticipantIds.filter(id => id !== participant.id));
+                          } else if (canSelect) {
+                            setFeaturedParticipantIds([...featuredParticipantIds, participant.id]);
+                          }
+                        }}
+                        disabled={!canSelect && !isSelected}
+                        className={`w-full flex items-center gap-3 p-2 rounded-lg transition-colors text-left ${
+                          isSelected
+                            ? "bg-[#00D1C1]/10 border border-[#00D1C1]/30"
+                            : canSelect
+                            ? "hover:bg-gray-50 border border-transparent"
+                            : "opacity-50 cursor-not-allowed border border-transparent"
+                        }`}
+                      >
+                        {/* Checkbox */}
+                        <div
+                          className={`h-4 w-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                            isSelected
+                              ? "border-[#00D1C1] bg-[#00D1C1]"
+                              : "border-gray-300"
+                          }`}
+                        >
+                          {isSelected && <Check className="h-3 w-3 text-white" />}
+                        </div>
+
+                        {/* Avatar */}
+                        <div
+                          className="h-8 w-8 rounded-full flex items-center justify-center text-white font-semibold text-xs flex-shrink-0"
+                          style={{ backgroundColor: brandColor }}
+                        >
+                          {participant.initials}
+                        </div>
+
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium truncate">
+                              {participant.name}
+                            </span>
+                            {isDefault && !isSelected && (
+                              <Badge variant="outline" className="text-[10px] px-1 py-0">
+                                Top
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span className="font-medium" style={{ color: brandColor }}>
+                              {participant.primaryMetric.value} {participant.primaryMetric.label}
+                            </span>
+                            <span>·</span>
+                            <div className="flex items-center gap-0.5">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={`h-2.5 w-2.5 ${
+                                    star <= participant.rating
+                                      ? "text-yellow-400 fill-yellow-400"
+                                      : "text-gray-300"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Embed Code */}
               <div>
                 <p className="text-sm font-medium mb-2">Embed Code</p>
@@ -378,7 +498,11 @@ export function WidgetSection({ studyId }: WidgetSectionProps) {
           wearableType: widgetData.wearableType,
           compensationNote: widgetData.compensationNote,
         }}
-        participants={widgetData.participants}
+        participants={
+          featuredParticipantIds.length > 0
+            ? widgetData.participants.filter(p => featuredParticipantIds.includes(p.id))
+            : widgetData.participants.slice(0, 3)
+        }
         verifyPageUrl={widgetData.verifyPageUrl}
         brandColor={brandColor}
       />
