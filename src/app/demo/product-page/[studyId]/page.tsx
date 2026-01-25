@@ -415,6 +415,7 @@ export default function DynamicProductPage() {
         }}
         participants={widgetData.participants}
         verifyPageUrl={widgetData.verifyPageUrl}
+        brandColor={customBrandColor || productInfo.brandColorHex}
       />
     </div>
   );
